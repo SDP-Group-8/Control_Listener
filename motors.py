@@ -89,7 +89,6 @@ class cameraMount:
                     self.motor2_1.stop()
                     self.motor2_2.stop()
                     break
-                time.sleep(0.1)
 
             print("Done Moving")
         else:  
