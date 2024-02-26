@@ -48,7 +48,7 @@ class cameraMount:
             self.degrees1 += 1
         elif not (blue == yellow):
             self.degrees1 -= 1
-        if self.targetPos1 and self.degrees1 == self.targetPos:
+        if self.targetPos1 and self.degrees1 == self.targetPos1:
             self.motor1_1.stop()
             self.motor1_2.stop()
             self.targetPos1 = None
@@ -61,7 +61,7 @@ class cameraMount:
             self.degrees2 += 1
         elif not (blue == yellow):
             self.degrees2 -= 1
-        if self.targetPos2 and self.degrees2 == self.targetPos:
+        if self.targetPos2 and self.degrees2 == self.targetPos2:
             self.motor2_1.stop()
             self.motor2_2.stop()
             self.targetPos2 = None
@@ -92,11 +92,11 @@ class cameraMount:
             while True:
                 if self.degrees1 == 0:
                     print("Motor 1 at 0")
-                if self.degrees1 == targetPos:
+                if self.degrees1 == self.targetPos1:
                     self.motor1_1.stop()
                     self.motor1_2.stop()
                     break
-                if self.degrees2 == targetPos:
+                if self.degrees2 == self.targetPos2:
                     self.motor2_1.stop()
                     self.motor2_2.stop()
                     break
