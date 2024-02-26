@@ -62,6 +62,7 @@ class cameraMount:
     def moveMotors(self, degrees):
         targetPos = self.degrees1 + degrees
         if 0 <= targetPos <= 134:
+            print("Target Position:", targetPos)
             if degrees > 0:
                 print("Moving Forwards")
                 self.motor1_1.start(100)
