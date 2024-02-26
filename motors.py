@@ -84,16 +84,14 @@ class cameraMount:
         else:
             print("Invalid degrees")
         
-        while (self.degrees1 != initialPos1 + degrees) and (self.degrees2 != initialPos2 + degrees):
-            print("Moving...")
-            time.sleep(0.1)
-
-        self.motor1_1.stop()
-        self.motor1_2.stop()
-        self.motor2_1.stop()
-        self.motor2_2.stop()
-        print("Moving Done")
-
+        while True:
+            if self.degrees1 == initialPos1 + degrees:
+                self.motor1_1.stop()
+                self.motor1_2.stop()
+            if self.degrees2 == initialPos2 + degrees:
+                self.motor2_1.stop()
+                self.motor2_2.stop()
+            time.sleep(0)
 
 c = cameraMount()
 c.moveMotors(90)
