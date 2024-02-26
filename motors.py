@@ -51,7 +51,7 @@ class cameraMount:
             self.motor1_1.stop()
             self.motor1_2.stop()
             self.targetPos = None
-        print("M1:", self.degrees1)
+        # print("M1:", self.degrees1)
 
     def motor2Callback(self, channel):
         blue = IO.input(self.BLUE2)
@@ -64,7 +64,7 @@ class cameraMount:
             self.motor2_1.stop()
             self.motor2_2.stop()
             self.targetPos = None
-        print("M2:", self.degrees2)
+        # print("M2:", self.degrees2)
 
 
     def moveMotors(self, degrees):
@@ -98,6 +98,7 @@ class cameraMount:
                     self.motor2_1.stop()
                     self.motor2_2.stop()
                     break
+                time.sleep(0.1)
             self.targetPos = None
             print("Done Moving")
         else:  
