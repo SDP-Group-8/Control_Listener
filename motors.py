@@ -104,7 +104,8 @@ class cameraMount:
             self.targetPos = None
             print("Done Moving")
         else: 
-            self.targetPos = None
+            self.targetPos1 = None
+            self.targetPos2 = None
             self.motor1_1.stop() 
             self.motor1_2.stop()
             self.motor2_1.stop()
