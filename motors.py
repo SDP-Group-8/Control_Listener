@@ -68,28 +68,30 @@ class cameraMount:
     def moveMotors(self, degrees):
         initialPos1 = self.degrees1
         initialPos2 = self.degrees2
+        print("Initial Pos: ", initialPos1, initialPos2)
         if degrees > 0:
-            self.motor1_1.ChangeDutyCycle(100)
-            self.motor1_2.ChangeDutyCycle(0)
-            self.motor2_1.ChangeDutyCycle(100)
-            self.motor2_2.ChangeDutyCycle(0)
+            print("Moving Forwards")
+            self.motor1_1.start(100)
+            self.motor1_2.start(0)
+            self.motor2_1.start(100)
+            self.motor2_2.start(0)
         elif degrees < 0:
-            self.motor1_1.ChangeDutyCycle(0)
-            self.motor1_2.ChangeDutyCycle(100)
-            self.motor2_1.ChangeDutyCycle(0)
-            self.motor2_2.ChangeDutyCycle(100)
+            print("Moving Backwards")
+            self.motor1_1.start(0)
+            self.motor1_2.start(100)
+            self.motor2_1.start(0)
+            self.motor2_2.start(100)
         else:
             print("Invalid degrees")
         
         while (degrees1.degrees != initialPos1 + degrees) and (degrees2.degrees != initialPos2 + degrees):
-            if (degrees1.degrees == initialPos1 + degrees):
-                self.motor1_1.ChangeDutyCycle(0)
-                self.motor1_2.ChangeDutyCycle(0)
-            if (degrees2.degrees == initialPos2 + degrees):
-                self.motor2_1.ChangeDutyCycle(0)
-                self.motor2_2.ChangeDutyCycle(0)
+            print("Moving...")
             time.sleep(0.1)
-
+            
+        self.motor1_1.stop()
+        self.motor1_2.stop()
+        self.motor2_1.stop()
+        self.motor2_2.stop()
         print("Moving Done")
 
 
