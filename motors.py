@@ -33,16 +33,10 @@ class cameraMount:
         IO.setup(self.M2_2, IO.OUT)
 
         self.motor1_1 = IO.PWM(self.M1_1, 100)
-        self.motor1_1.start(0)
-
         self.motor1_2 = IO.PWM(self.M1_2, 100)
-        self.motor1_2.start(0)
 
         self.motor2_1 = IO.PWM(self.M2_1, 100)
-        self.motor2_1.start(0)
-
         self.motor2_2 = IO.PWM(self.M2_2, 100)
-        self.motor2_2.start(0)
 
     def motor1Callback(self, channel):
         global degrees1
@@ -66,32 +60,39 @@ class cameraMount:
 
 
     def moveMotors(self, degrees):
-        initialPos1 = self.degrees1
-        initialPos2 = self.degrees2
-        print("Initial Pos: ", initialPos1, initialPos2)
-        if degrees > 0:
-            print("Moving Forwards")
-            self.motor1_1.start(100)
-            self.motor1_2.start(0)
-            self.motor2_1.start(100)
-            self.motor2_2.start(0)
-        elif degrees < 0:
-            print("Moving Backwards")
-            self.motor1_1.start(0)
-            self.motor1_2.start(100)
-            self.motor2_1.start(0)
-            self.motor2_2.start(100)
-        else:
-            print("Invalid degrees")
-        
-        while True:
-            if self.degrees1 == initialPos1 + degrees:
-                self.motor1_1.stop()
-                self.motor1_2.stop()
-            if self.degrees2 == initialPos2 + degrees:
-                self.motor2_1.stop()
-                self.motor2_2.stop()
-            time.sleep(0)
+        targetPos = self.degrees1 + degrees
+        if 0 <= targetPos <= 134:
+            if degrees > 0:
+                print("Moving Forwards")
+                self.motor1_1.start(100)
+                self.motor1_2.start(0)
+                self.motor2_1.start(100)
+                self.motor2_2.start(0)
+            elif degrees < 0:
+                print("Moving Backwards")
+                self.motor1_1.start(0)
+                self.motor1_2.start(100)
+                self.motor2_1.start(0)
+                self.motor2_2.start(100)
+            else:
+                print("Invalid degrees")
+            
+            while True:
+                if self.degrees1 == targetPos:
+                    self.motor1_1.stop()
+                    self.motor1_2.stop()
+                    break
+                if self.degrees2 == targetPos:
+                    self.motor2_1.stop()
+                    self.motor2_2.stop()
+                    break
+                time.sleep(0.1)
+
+            print("Done Moving")
+        else:  
+            print("Degrees out of range or invalid")
 
 c = cameraMount()
 c.moveMotors(90)
+c.moveMotors(-90)
+c.moveMotors(300)
