@@ -16,7 +16,8 @@ class cameraMount:
         self.degrees1 = 0
         self.degrees2 = 0
 
-        self.targetPos = None
+        self.targetPos1 = None
+        self.targetPos2 = None
 
         IO.setwarnings(False)
         IO.setmode(IO.BCM)
@@ -47,10 +48,10 @@ class cameraMount:
             self.degrees1 += 1
         elif not (blue == yellow):
             self.degrees1 -= 1
-        if self.targetPos and self.degrees1 == self.targetPos:
+        if self.targetPos1 and self.degrees1 == self.targetPos:
             self.motor1_1.stop()
             self.motor1_2.stop()
-            self.targetPos = None
+            self.targetPos1 = None
         # print("M1:", self.degrees1)
 
     def motor2Callback(self, channel):
@@ -60,17 +61,18 @@ class cameraMount:
             self.degrees2 += 1
         elif not (blue == yellow):
             self.degrees2 -= 1
-        if self.targetPos and self.degrees2 == self.targetPos:
+        if self.targetPos2 and self.degrees2 == self.targetPos:
             self.motor2_1.stop()
             self.motor2_2.stop()
-            self.targetPos = None
+            self.targetPos2 = None
         # print("M2:", self.degrees2)
 
 
     def moveMotors(self, degrees):
         targetPos = self.degrees1 + degrees
         if 0 <= targetPos <= 134:
-            self.targetPos = targetPos
+            self.targetPos1 = targetPos
+            self.targetPos2 = targetPos
             print("Target Position:", targetPos)
             if degrees > 0:
                 print("Moving Forwards")
