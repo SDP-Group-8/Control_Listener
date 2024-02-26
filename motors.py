@@ -49,9 +49,9 @@ class cameraMount:
         blue = IO.input(self.BLUE1)
         yellow = IO.input(self.YELLOW1)
         if blue == yellow:
-            degrees1 += 1
+            self.degrees1 += 1
         elif not (blue == yellow):
-            degrees1 -= 1
+            self.degrees1 -= 1
         print("M1:", self.degrees1)
 
     def motor2Callback(self, channel):
@@ -59,9 +59,9 @@ class cameraMount:
         blue = IO.input(self.BLUE2)
         yellow = IO.input(self.YELLOW2)
         if blue == yellow:
-            degrees2 += 1
+            self.degrees2 += 1
         elif not (blue == yellow):
-            degrees2 -= 1
+            self.degrees2 -= 1
         print("M2:", self.degrees2)
 
 
@@ -84,10 +84,10 @@ class cameraMount:
         else:
             print("Invalid degrees")
         
-        while (degrees1.degrees != initialPos1 + degrees) and (degrees2.degrees != initialPos2 + degrees):
+        while (self.degrees1 != initialPos1 + degrees) and (self.degrees2 != initialPos2 + degrees):
             print("Moving...")
             time.sleep(0.1)
-            
+
         self.motor1_1.stop()
         self.motor1_2.stop()
         self.motor2_1.stop()
