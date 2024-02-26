@@ -1,83 +1,97 @@
-import signal
 import time
-import sys
 import RPi.GPIO as IO
 
 class cameraMount:
     def __init__(self):
-	
+        self.YELLOW1 = 26
+        self.BLUE1 = 19
+        self.YELLOW2 = 21
+        self.BLUE2 = 20
 
-	self.YELLOW1 = 26
-	self.BLUE1 = 19
-	self.YELLOW2 = 21
-	self.BLUE2 = 20
+        self.M1_1 = 13
+        self.M1_2 = 6
+        self.M2_1 = 12
+        self.M2_2 = 16
 
-	self.M1_1 = 13
-	self.M1_2 = 6
-	self.M2_1 = 12
-	self.M2_2 = 16
+        self.degrees1 = 0
+        self.degrees2 = 0
 
-	self.degrees1 = 0
-	degrees2 = 0
+        IO.setwarnings(False)
+        IO.setmode(IO.BCM)
 
-def signal_handler(sig, frame):
-    IO.cleanup()
-    sys.exit(0)
+        IO.setup(self.YELLOW1, IO.IN, pull_up_down=IO.PUD_DOWN)
+        IO.setup(self.BLUE1, IO.IN, pull_up_down=IO.PUD_DOWN)
+        IO.setup(self.YELLOW2, IO.IN, pull_up_down=IO.PUD_DOWN)
+        IO.setup(self.BLUE2, IO.IN, pull_up_down=IO.PUD_DOWN)
 
-def motor1Callback(channel):
-    global degrees1
-    blue = IO.input(BLUE1)
-    yellow = IO.input(YELLOW1)
-    if blue == yellow:
-        degrees1 += 1
-    elif not (blue == yellow):
-        degrees1 -= 1
-    print("M1:", degrees1)
+        IO.add_event_detect(self.YELLOW1, IO.RISING, callback=self.motor1Callback, bouncetime=30)
+        IO.add_event_detect(self.YELLOW2, IO.RISING, callback=self.motor2Callback, bouncetime=30)
 
-def motor2Callback(channel):
-    global degrees2
-    blue = IO.input(BLUE2)
-    yellow = IO.input(YELLOW2)
-    if blue == yellow:
-        degrees2 += 1
-    elif not (blue == yellow):
-        degrees2 -= 1
-    print("M2:", degrees2)
+        IO.setup(self.M1_1, IO.OUT)
+        IO.setup(self.M1_2, IO.OUT)
+        IO.setup(self.M2_1, IO.OUT)
+        IO.setup(self.M2_2, IO.OUT)
 
-IO.setwarnings(False)
-IO.setmode(IO.BCM)
+        self.motor1_1 = IO.PWM(self.M1_1, 100)
+        self.motor1_1.start(0)
 
-IO.setup(YELLOW1, IO.IN, pull_up_down=IO.PUD_DOWN)
-IO.setup(BLUE1, IO.IN, pull_up_down=IO.PUD_DOWN)
-IO.setup(YELLOW2, IO.IN, pull_up_down=IO.PUD_DOWN)
-IO.setup(BLUE2, IO.IN, pull_up_down=IO.PUD_DOWN)
+        self.motor1_2 = IO.PWM(self.M1_2, 100)
+        self.motor1_2.start(0)
 
-IO.setup(M1_1, IO.OUT)
-IO.setup(M1_2, IO.OUT)
-IO.setup(M2_1, IO.OUT)
-IO.setup(M2_2, IO.OUT)
+        self.motor2_1 = IO.PWM(self.M2_1, 100)
+        self.motor2_1.start(0)
 
-motor1_1 = IO.PWM(M1_1, 100)
-motor1_1.start(0)
+        self.motor2_2 = IO.PWM(self.M2_2, 100)
+        self.motor2_2.start(0)
 
-motor1_2 = IO.PWM(M1_2, 100)
-motor1_2.start(0)
+    def motor1Callback(self, channel):
+        global degrees1
+        blue = IO.input(self.BLUE1)
+        yellow = IO.input(self.YELLOW1)
+        if blue == yellow:
+            degrees1 += 1
+        elif not (blue == yellow):
+            degrees1 -= 1
+        print("M1:", self.degrees1)
 
-motor2_1 = IO.PWM(M2_1, 100)
-motor2_1.start(0)
+    def motor2Callback(self, channel):
+        global degrees2
+        blue = IO.input(self.BLUE2)
+        yellow = IO.input(self.YELLOW2)
+        if blue == yellow:
+            degrees2 += 1
+        elif not (blue == yellow):
+            degrees2 -= 1
+        print("M2:", self.degrees2)
 
-motor2_2 = IO.PWM(M2_2, 100)
-motor2_2.start(0)
 
-IO.add_event_detect(YELLOW1, IO.RISING, callback=motor1Callback, bouncetime=300)
-IO.add_event_detect(YELLOW2, IO.RISING, callback=motor2Callback, bouncetime=300)
+    def moveMotors(self, degrees):
+        initialPos1 = self.degrees1
+        initialPos2 = self.degrees2
+        if degrees > 0:
+            self.motor1_1.ChangeDutyCycle(100)
+            self.motor1_2.ChangeDutyCycle(0)
+            self.motor2_1.ChangeDutyCycle(100)
+            self.motor2_2.ChangeDutyCycle(0)
+        elif degrees < 0:
+            self.motor1_1.ChangeDutyCycle(0)
+            self.motor1_2.ChangeDutyCycle(100)
+            self.motor2_1.ChangeDutyCycle(0)
+            self.motor2_2.ChangeDutyCycle(100)
+        else:
+            print("Invalid degrees")
+        
+        while (degrees1.degrees != initialPos1 + degrees) and (degrees2.degrees != initialPos2 + degrees):
+            if (degrees1.degrees == initialPos1 + degrees):
+                self.motor1_1.ChangeDutyCycle(0)
+                self.motor1_2.ChangeDutyCycle(0)
+            if (degrees2.degrees == initialPos2 + degrees):
+                self.motor2_1.ChangeDutyCycle(0)
+                self.motor2_2.ChangeDutyCycle(0)
+            time.sleep(0.1)
 
-while True:
-    for x in range(50):
-        motor1_1.ChangeDutyCycle(x)
-	motor2_1.ChangeDutyCycle(x)
-        time.sleep(0.1)
-    for x in range(50):
-        motor1_1.ChangeDutyCycle(50-x)
-	motor2_1.ChangeDutyCycle(50-x)
-        time.sleep(0.1)
+        print("Moving Done")
+
+
+c = cameraMount()
+c.moveMotors(90)
