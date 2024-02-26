@@ -87,19 +87,19 @@ class cameraMount:
             else:
                 print("Invalid degrees")
             
-            # while True:
-            #     if self.degrees1 == 0:
-            #         print("Motor 1 at 0")
-            #     if self.degrees1 == targetPos:
-            #         self.motor1_1.stop()
-            #         self.motor1_2.stop()
-            #         break
-            #     if self.degrees2 == targetPos:
-            #         self.motor2_1.stop()
-            #         self.motor2_2.stop()
-            #         break
-            # self.targetPos = None
-            # print("Done Moving")
+            while True:
+                if self.degrees1 == 0:
+                    print("Motor 1 at 0")
+                if self.degrees1 == targetPos:
+                    self.motor1_1.stop()
+                    self.motor1_2.stop()
+                    break
+                if self.degrees2 == targetPos:
+                    self.motor2_1.stop()
+                    self.motor2_2.stop()
+                    break
+            self.targetPos = None
+            print("Done Moving")
         else:  
             print("Degrees out of range or invalid")
 
