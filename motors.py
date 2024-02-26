@@ -16,6 +16,8 @@ class cameraMount:
         self.degrees1 = 0
         self.degrees2 = 0
 
+        self.targetPos = None
+
         IO.setwarnings(False)
         IO.setmode(IO.BCM)
 
@@ -39,29 +41,36 @@ class cameraMount:
         self.motor2_2 = IO.PWM(self.M2_2, 100)
 
     def motor1Callback(self, channel):
-        global degrees1
         blue = IO.input(self.BLUE1)
         yellow = IO.input(self.YELLOW1)
         if blue == yellow:
             self.degrees1 += 1
         elif not (blue == yellow):
             self.degrees1 -= 1
+        if self.targetPos and self.degrees1 == self.targetPos:
+            self.motor1_1.stop()
+            self.motor1_2.stop()
+            self.targetPos = None
         print("M1:", self.degrees1)
 
     def motor2Callback(self, channel):
-        global degrees2
         blue = IO.input(self.BLUE2)
         yellow = IO.input(self.YELLOW2)
         if blue == yellow:
             self.degrees2 += 1
         elif not (blue == yellow):
             self.degrees2 -= 1
+        if self.targetPos and self.degrees2 == self.targetPos:
+            self.motor2_1.stop()
+            self.motor2_2.stop()
+            self.targetPos = None
         print("M2:", self.degrees2)
 
 
     def moveMotors(self, degrees):
         targetPos = self.degrees1 + degrees
         if 0 <= targetPos <= 134:
+            self.targetPos = targetPos
             print("Target Position:", targetPos)
             if degrees > 0:
                 print("Moving Forwards")
@@ -78,19 +87,19 @@ class cameraMount:
             else:
                 print("Invalid degrees")
             
-            while True:
-                if self.degrees1 == 0:
-                    print("Motor 1 at 0")
-                if self.degrees1 == targetPos:
-                    self.motor1_1.stop()
-                    self.motor1_2.stop()
-                    break
-                if self.degrees2 == targetPos:
-                    self.motor2_1.stop()
-                    self.motor2_2.stop()
-                    break
-
-            print("Done Moving")
+            # while True:
+            #     if self.degrees1 == 0:
+            #         print("Motor 1 at 0")
+            #     if self.degrees1 == targetPos:
+            #         self.motor1_1.stop()
+            #         self.motor1_2.stop()
+            #         break
+            #     if self.degrees2 == targetPos:
+            #         self.motor2_1.stop()
+            #         self.motor2_2.stop()
+            #         break
+            # self.targetPos = None
+            # print("Done Moving")
         else:  
             print("Degrees out of range or invalid")
 
