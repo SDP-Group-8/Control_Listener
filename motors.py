@@ -111,4 +111,4 @@ class cameraMount:
 
 c = cameraMount()
 c.moveMotors(90)
-c.moveMotors(300)
+c.moveMotors(-40)
