@@ -101,7 +101,12 @@ class cameraMount:
                 time.sleep(0.1)
             self.targetPos = None
             print("Done Moving")
-        else:  
+        else: 
+            self.targetPos = None
+            self.motor1_1.stop() 
+            self.motor1_2.stop()
+            self.motor2_1.stop()
+            self.motor2_2.stop()
             print("Degrees out of range or invalid")
 
 c = cameraMount()
