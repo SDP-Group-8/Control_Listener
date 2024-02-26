@@ -79,6 +79,8 @@ class cameraMount:
                 print("Invalid degrees")
             
             while True:
+                if self.degrees1 == 0:
+                    print("Motor 1 at 0")
                 if self.degrees1 == targetPos:
                     self.motor1_1.stop()
                     self.motor1_2.stop()
