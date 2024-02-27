@@ -101,7 +101,3 @@ class cameraMount:
             self.motor2_1.stop()
             self.motor2_2.stop()
             print("Degrees out of range or invalid")
-
-c = cameraMount()
-c.moveMotors(90)
-c.moveMotors(-40)
