@@ -101,7 +101,3 @@ class ControlListenerNode:
             print("Done Moving")
         else: 
             print("Degrees out of range or invalid")
-
-if __name__ == '__main__':
-    node = ControlListenerNode()
-    node.init()
