@@ -43,8 +43,8 @@ class ControlListenerNode:
         self.motor2_1 = IO.PWM(self.M2_1, 100)
         self.motor2_2 = IO.PWM(self.M2_2, 100)
 
-    def set_distance_callback(self, dst):
-        self.move_motors(dst)
+    def set_distance_callback(self, twist):
+        self.move_motors(twist.linear.z)
 
     def init(self):
         rospy.Subscriber("distance", Twist, self.set_distance_callback)
