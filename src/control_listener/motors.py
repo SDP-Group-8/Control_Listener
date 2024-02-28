@@ -49,6 +49,7 @@ class ControlListenerNode:
     def init(self):
         rospy.Subscriber("distance", Twist, self.set_distance_callback)
         rospy.init_node("control_listener_node", anonymous=True)
+        rospy.spin()
 
     def motor_1_callback(self, channel):
         blue = IO.input(self.BLUE1)
