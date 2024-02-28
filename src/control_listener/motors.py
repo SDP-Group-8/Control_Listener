@@ -47,7 +47,7 @@ class ControlListenerNode:
         self.move_motors(twist.linear.z)
 
     def init(self):
-        rospy.Subscriber("distance", Twist, self.set_distance_callback)
+        rospy.Subscriber("/cmd_vel", Twist, self.set_distance_callback)
         rospy.init_node("control_listener_node", anonymous=True)
         rospy.spin()
 
