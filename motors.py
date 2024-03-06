@@ -54,6 +54,9 @@ class cameraMount:
         self.motor1 = IO.PWM(self.ENA, 100)
         self.motor2 = IO.PWM(self.ENB, 100)
 
+        self.motor1.start(0)
+        self.motor2.start(0)
+
     def motor1Callback(self):
         # Read motor encoder inputs
         blue = IO.input(self.BLUE1)
@@ -135,6 +138,11 @@ class cameraMount:
     def setCameraHeight(self, position):
         if self.minPos <= position <= self.maxPos:
             self.targetPos1 = position
+            self.setMotor1Speed(100)
+            self.setMotor2Speed(100)
+            self.setMotor1Direction("up")
+            self.setMotor2Direction("up")
+
         else:
             print("Invalid Position Input")
 
