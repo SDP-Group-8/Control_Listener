@@ -112,13 +112,13 @@ class cameraMount:
             self.setMotor2Direction("down")
             self.setMotor2Speed(100)
 
-    async def setCameraHeight(self, position):
+    def setCameraHeight(self, position):
         if self.minPos <= position <= self.maxPos:
             self.targetPos = position
-            await self.setMotor1Speed(100)
-            await self.setMotor2Speed(100)
-            await self.setMotor1Direction("up")
-            await self.setMotor2Direction("up")
+            self.setMotor1Speed(100)
+            self.setMotor2Speed(100)
+            self.setMotor1Direction("up")
+            self.setMotor2Direction("up")
 
         else:
             print("Invalid Position Input")
@@ -126,15 +126,15 @@ class cameraMount:
     '''
     Utility Functions for setting motor direction
     '''
-    async def setMotor1Speed(self, speed):
+    def setMotor1Speed(self, speed):
         print("Motor speed called")
         self.motor1.ChangeDutyCycle(speed)
 
-    async def setMotor2Speed(self, speed):
+    def setMotor2Speed(self, speed):
         print("Motor speed called")
         self.motor2.ChangeDutyCycle(speed)
 
-    async def setMotor1Direction(self, direction):
+    def setMotor1Direction(self, direction):
         if direction == "down":
             IO.output(self.M1_1, IO.HIGH)
             IO.output(self.M1_2, IO.LOW)
@@ -144,7 +144,7 @@ class cameraMount:
         else:
             print("Invalid Direction Input")
 
-    async def setMotor2Direction(self, direction):
+    def setMotor2Direction(self, direction):
         if direction == "up":
             IO.output(self.M2_1, IO.LOW)
             IO.output(self.M2_2, IO.HIGH)
