@@ -100,15 +100,17 @@ class cameraMount:
         # If target position is reached, stop motors
         if self.degrees2 == self.targetPos:
             print("M2 at Target Position")
-            self.motor1.ChangeDutyCycle(0)
+            self.motor2.stop()
         # If target position too low move motors up
         elif self.degrees2 < self.targetPos:
             print("M2 too low")
             self.setMotor2Direction("up")
+            self.motor2.start(30)
         # If target position too high move motors down
         elif self.degrees2 > self.targetPos:
             print("M2 too high")
             self.setMotor2Direction("down")
+            self.motor2.start(30)
 
     def setCameraHeight(self, position):
         if self.minPos <= position <= self.maxPos:
@@ -133,6 +135,7 @@ class cameraMount:
         self.motor2.ChangeDutyCycle(speed)
 
     def setMotor1Direction(self, direction):
+        print("Direction Changed")
         if direction == "down":
             IO.output(self.M1_1, IO.HIGH)
             IO.output(self.M1_2, IO.LOW)
@@ -143,6 +146,7 @@ class cameraMount:
             print("Invalid Direction Input")
 
     def setMotor2Direction(self, direction):
+        print("Direction Changed")
         if direction == "up":
             IO.output(self.M2_1, IO.LOW)
             IO.output(self.M2_2, IO.HIGH)
