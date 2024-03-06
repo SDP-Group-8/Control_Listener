@@ -140,8 +140,8 @@ class cameraMount:
             IO.output(self.M1_1, IO.LOW)
             IO.output(self.M1_2, IO.HIGH)
         elif direction == "down":
-            IO.output(self.M1_1, IO.LOW)
-            IO.output(self.M1_2, IO.HIGH)
+            IO.output(self.M1_1, IO.HIGH)
+            IO.output(self.M1_2, IO.LOW)
         else:
             print("Invalid Direction Input")
 
