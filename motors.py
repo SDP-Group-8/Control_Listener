@@ -56,7 +56,7 @@ class cameraMount:
         self.motor1.start(0)
         self.motor2.start(0)
 
-    async def motor1Callback(self, channel):
+    def motor1Callback(self, channel):
         # Read motor encoder inputs
         blue = IO.input(self.BLUE1)
         # Update motor position
@@ -82,7 +82,7 @@ class cameraMount:
             IO.output(self.M1_2, IO.LOW)
             self.motor1.start(30)
 
-    async def motor2Callback(self, channel):
+    def motor2Callback(self, channel):
         # Read motor encoder inputs
         blue = IO.input(self.BLUE2)
         # Update motor position
