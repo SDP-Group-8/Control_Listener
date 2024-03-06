@@ -41,8 +41,8 @@ class cameraMount:
         IO.setup(self.YELLOW2, IO.IN, pull_up_down=IO.PUD_DOWN)
         IO.setup(self.BLUE2, IO.IN, pull_up_down=IO.PUD_DOWN)
 
-        IO.add_event_detect(self.YELLOW1, IO.RISING, callback=self.motor1Callback, bouncetime=15)
-        IO.add_event_detect(self.YELLOW2, IO.RISING, callback=self.motor2Callback, bouncetime=15)
+        IO.add_event_detect(self.YELLOW1, IO.RISING, callback=self.motor1Callback, bouncetime=5)
+        IO.add_event_detect(self.YELLOW2, IO.RISING, callback=self.motor2Callback, bouncetime=5)
 
         IO.setup(self.ENA, IO.OUT)
         IO.setup(self.ENB, IO.OUT)
@@ -70,7 +70,7 @@ class cameraMount:
         Move motors accordingly to target position
         '''
         # If target position is reached, stop motors
-        if self.targetPos - 1 < self.degrees1 < self.targetPos + 1:
+        if self.targetPos == self.degrees1:
             self.motor1.stop()
         # If target position too low move motors up
         elif self.degrees1 < self.targetPos:
@@ -96,7 +96,7 @@ class cameraMount:
         Move motors accordingly to target position
         '''
         # If target position is reached, stop motors
-        if self.targetPos - 1 < self.degrees2 < self.targetPos + 1:
+        if self.targetPos == self.degrees2:
             self.motor2.stop()
         # If target position too low move motors up
         elif self.degrees2 < self.targetPos:
