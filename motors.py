@@ -77,12 +77,12 @@ class cameraMount:
         elif self.degrees1 < self.targetPos:
             print("M1 too low")
             self.setMotor1Direction("up")
-            self.setMotor1Speed(100)
+            self.setMotor1Speed(0)
         # If target position too high move motors down
         elif self.degrees1 > self.targetPos:
             print("M1 too high")
             self.setMotor2Direction("down")
-            self.setMotor2Speed(100)
+            self.setMotor2Speed(0)
 
     def motor2Callback(self, channel):
         # Read motor encoder inputs
