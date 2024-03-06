@@ -69,17 +69,17 @@ class cameraMount:
         '''
         Move motors accordingly to target position
         '''
-        # # If target position is reached, stop motors
-        # if self.degrees1 == self.targetPos:
-        #     self.setMotor1Speed(0)
-        # # If target position too low move motors up
-        # elif self.degrees1 < self.targetPos:
-        #     self.setMotor1Direction("up")
-        #     self.setMotor1Speed(100)
-        # # If target position too high move motors down
-        # elif self.degrees1 > self.targetPos:
-        #     self.setMotor2Direction("down")
-        #     self.setMotor2Speed(100)
+        # If target position is reached, stop motors
+        if self.degrees1 == self.targetPos:
+            self.setMotor1Speed(0)
+        # If target position too low move motors up
+        elif self.degrees1 < self.targetPos:
+            self.setMotor1Direction("up")
+            self.setMotor1Speed(100)
+        # If target position too high move motors down
+        elif self.degrees1 > self.targetPos:
+            self.setMotor2Direction("down")
+            self.setMotor2Speed(100)
 
     def motor2Callback(self, channel):
         # Read motor encoder inputs
@@ -94,25 +94,25 @@ class cameraMount:
         '''
         Move motors accordingly to target position
         '''
-        # # If target position is reached, stop motors
-        # if self.degrees2 == self.targetPos:
-        #     self.setMotor2Speed(0)
-        # # If target position too low move motors up
-        # elif self.degrees2 < self.targetPos:
-        #     self.setMotor2Direction("up")
-        #     self.setMotor2Speed(100)
-        # # If target position too high move motors down
-        # elif self.degrees2 > self.targetPos:
-        #     self.setMotor2Direction("down")
-        #     self.setMotor2Speed(100)
+        # If target position is reached, stop motors
+        if self.degrees2 == self.targetPos:
+            self.setMotor2Speed(0)
+        # If target position too low move motors up
+        elif self.degrees2 < self.targetPos:
+            self.setMotor2Direction("up")
+            self.setMotor2Speed(100)
+        # If target position too high move motors down
+        elif self.degrees2 > self.targetPos:
+            self.setMotor2Direction("down")
+            self.setMotor2Speed(100)
 
     def setCameraHeight(self, position):
         if self.minPos <= position <= self.maxPos:
             self.targetPos = position
-            # self.setMotor1Speed(100)
-            # self.setMotor2Speed(100)
-            # self.setMotor1Direction("up")
-            # self.setMotor2Direction("up")
+            self.setMotor1Speed(100)
+            self.setMotor2Speed(100)
+            self.setMotor1Direction("up")
+            self.setMotor2Direction("up")
 
         else:
             print("Invalid Position Input")
