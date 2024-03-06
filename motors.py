@@ -127,20 +127,20 @@ class cameraMount:
         self.motor2.ChangeDutyCycle(speed)
 
     def setMotor1Direction(self, direction):
-        if direction == "up":
+        if direction == "down":
             IO.output(self.M1_1, IO.HIGH)
             IO.output(self.M1_2, IO.LOW)
-        elif direction == "down":
+        elif direction == "up":
             IO.output(self.M1_1, IO.LOW)
             IO.output(self.M1_2, IO.HIGH)
         else:
             print("Invalid Direction Input")
 
     def setMotor2Direction(self, direction):
-        if direction == "up":
+        if direction == "down":
             IO.output(self.M2_1, IO.LOW)
             IO.output(self.M2_2, IO.HIGH)
-        elif direction == "down":
+        elif direction == "up":
             IO.output(self.M2_1, IO.HIGH)
             IO.output(self.M2_2, IO.LOW)
         else:
