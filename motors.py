@@ -40,8 +40,8 @@ class cameraMount:
         IO.setup(self.YELLOW2, IO.IN, pull_up_down=IO.PUD_DOWN)
         IO.setup(self.BLUE2, IO.IN, pull_up_down=IO.PUD_DOWN)
 
-        IO.add_event_detect(self.YELLOW1, IO.RISING, callback=self.motor1Callback, bouncetime=30)
-        IO.add_event_detect(self.YELLOW2, IO.RISING, callback=self.motor2Callback, bouncetime=30)
+        IO.add_event_detect(self.YELLOW1, IO.RISING, callback=self.motor1Callback, bouncetime=300)
+        IO.add_event_detect(self.YELLOW2, IO.RISING, callback=self.motor2Callback, bouncetime=300)
 
         IO.setup(self.ENA, IO.OUT)
         IO.setup(self.ENB, IO.OUT)
@@ -50,8 +50,8 @@ class cameraMount:
         IO.setup(self.M2_1, IO.OUT)
         IO.setup(self.M2_2, IO.OUT)
 
-        self.motor1 = IO.PWM(self.ENA, 100)
-        self.motor2 = IO.PWM(self.ENB, 100)
+        self.motor1 = IO.PWM(self.ENA, 30)
+        self.motor2 = IO.PWM(self.ENB, 30)
 
         self.motor1.start(0)
         self.motor2.start(0)
@@ -115,8 +115,8 @@ class cameraMount:
     def setCameraHeight(self, position):
         if self.minPos <= position <= self.maxPos:
             self.targetPos = position
-            self.setMotor1Speed(10)
-            self.setMotor2Speed(10)
+            self.setMotor1Speed(30)
+            self.setMotor2Speed(30)
             self.setMotor1Direction("up")
             self.setMotor2Direction("up")
 
