@@ -27,8 +27,7 @@ class cameraMount:
         self.minPos = 0
         self.maxPos = 134
 
-        self.targetPos1 = None
-        self.targetPos2 = None
+        self.targetPos = 0
 
         '''
         GPIO Setup
@@ -70,14 +69,14 @@ class cameraMount:
         Move motors accordingly to target position
         '''
         # If target position is reached, stop motors
-        if self.degrees1 == self.targetPos1:
+        if self.degrees1 == self.targetPos:
             self.setMotor1Speed(0)
         # If target position too low move motors up
-        elif self.degrees1 < self.targetPos1:
+        elif self.degrees1 < self.targetPos:
             self.setMotor1Direction("up")
             self.setMotor1Speed(100)
         # If target position too high move motors down
-        elif self.degrees1 > self.targetPos1:
+        elif self.degrees1 > self.targetPos:
             self.setMotor2Direction("down")
             self.setMotor2Speed(100)
 
@@ -94,14 +93,14 @@ class cameraMount:
         Move motors accordingly to target position
         '''
         # If target position is reached, stop motors
-        if self.degrees2 == self.targetPos2:
+        if self.degrees2 == self.targetPos:
             self.setMotor2Speed(0)
         # If target position too low move motors up
-        elif self.degrees2 < self.targetPos2:
+        elif self.degrees2 < self.targetPos:
             self.setMotor2Direction("up")
             self.setMotor2Speed(100)
         # If target position too high move motors down
-        elif self.degrees2 > self.targetPos2:
+        elif self.degrees2 > self.targetPos:
             self.setMotor2Direction("down")
             self.setMotor2Speed(100)
 
@@ -165,10 +164,10 @@ class cameraMount:
 
     def setMotor2Direction(self, direction):
         if direction == "up":
-            IO.output(self.M2_1, IO.HIGH)
-            IO.output(self.M2_2, IO.LOW)
-        elif direction == "down":
             IO.output(self.M2_1, IO.LOW)
             IO.output(self.M2_2, IO.HIGH)
+        elif direction == "down":
+            IO.output(self.M2_1, IO.HIGH)
+            IO.output(self.M2_2, IO.LOW)
         else:
             print("Invalid Direction Input")
