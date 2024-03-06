@@ -65,19 +65,22 @@ class cameraMount:
             self.degrees1 += 1
         elif not (blue == yellow):
             self.degrees1 -= 1
-        print("Motor 1 Pos:", self.degrees1)
+        # print("Motor 1 Pos:", self.degrees1)
         '''
         Move motors accordingly to target position
         '''
         # If target position is reached, stop motors
         if self.degrees1 == self.targetPos:
+            print("M1 at Target Position")
             self.setMotor1Speed(0)
         # If target position too low move motors up
         elif self.degrees1 < self.targetPos:
+            print("M1 too low")
             self.setMotor1Direction("up")
             self.setMotor1Speed(100)
         # If target position too high move motors down
         elif self.degrees1 > self.targetPos:
+            print("M1 too high")
             self.setMotor2Direction("down")
             self.setMotor2Speed(100)
 
@@ -90,19 +93,22 @@ class cameraMount:
             self.degrees2 += 1
         elif not (blue == yellow):
             self.degrees2 -= 1
-        print("Motor 2 Pos:", self.degrees2)
+        # print("Motor 2 Pos:", self.degrees2)
         '''
         Move motors accordingly to target position
         '''
         # If target position is reached, stop motors
         if self.degrees2 == self.targetPos:
+            print("M2 at Target Position")
             self.setMotor2Speed(0)
         # If target position too low move motors up
         elif self.degrees2 < self.targetPos:
+            print("M2 too low")
             self.setMotor2Direction("up")
             self.setMotor2Speed(100)
         # If target position too high move motors down
         elif self.degrees2 > self.targetPos:
+            print("M2 too high")
             self.setMotor2Direction("down")
             self.setMotor2Speed(100)
 
