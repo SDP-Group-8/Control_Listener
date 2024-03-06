@@ -26,6 +26,7 @@ class cameraMount:
 
         self.minPos = 0
         self.maxPos = 134
+        self.motorSpeed = 100
 
         self.targetPos = 0
 
@@ -50,8 +51,8 @@ class cameraMount:
         IO.setup(self.M2_1, IO.OUT)
         IO.setup(self.M2_2, IO.OUT)
 
-        self.motor1 = IO.PWM(self.ENA, 30)
-        self.motor2 = IO.PWM(self.ENB, 30)
+        self.motor1 = IO.PWM(self.ENA, 100)
+        self.motor2 = IO.PWM(self.ENB, 100)
 
         self.motor1.start(0)
         self.motor2.start(0)
@@ -75,12 +76,12 @@ class cameraMount:
         elif self.degrees1 < self.targetPos:
             IO.output(self.M1_1, IO.LOW)
             IO.output(self.M1_2, IO.HIGH)
-            self.motor1.start(30)
+            self.motor1.start(self.motorSpeed)
         # If target position too high move motors down
         elif self.degrees1 > self.targetPos:
             IO.output(self.M1_1, IO.HIGH)
             IO.output(self.M1_2, IO.LOW)
-            self.motor1.start(30)
+            self.motor1.start(self.motorSpeed)
 
     def motor2Callback(self, channel):
         # Read motor encoder inputs
@@ -101,18 +102,18 @@ class cameraMount:
         elif self.degrees2 < self.targetPos:
             IO.output(self.M2_1, IO.HIGH)
             IO.output(self.M2_2, IO.LOW)
-            self.motor2.start(30)
+            self.motor2.start(self.motorSpeed)
         # If target position too high move motors down
         elif self.degrees2 > self.targetPos:
             IO.output(self.M2_1, IO.LOW)
             IO.output(self.M2_2, IO.HIGH)
-            self.motor2.start(30)
+            self.motor2.start(self.motorSpeed)
 
     def setCameraHeight(self, position):
         if self.minPos <= position <= self.maxPos:
             self.targetPos = position
-            self.setMotor1Speed(30)
-            self.setMotor2Speed(30)
+            self.setMotor1Speed(self.motorSpeed)
+            self.setMotor2Speed(self.motorSpeed)
             self.setMotor1Direction("up")
             self.setMotor2Direction("up")
 
