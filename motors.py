@@ -100,7 +100,7 @@ class cameraMount:
         # If target position is reached, stop motors
         if self.degrees2 == self.targetPos:
             print("M2 at Target Position")
-            self.motor1.stop()
+            self.motor1.ChangeDutyCycle(0)
         # If target position too low move motors up
         elif self.degrees2 < self.targetPos:
             print("M2 too low")
