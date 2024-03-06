@@ -100,17 +100,15 @@ class cameraMount:
         # If target position is reached, stop motors
         if self.degrees2 == self.targetPos:
             print("M2 at Target Position")
-            self.setMotor2Speed(0)
+            self.motor1.stop()
         # If target position too low move motors up
         elif self.degrees2 < self.targetPos:
             print("M2 too low")
             self.setMotor2Direction("up")
-            self.setMotor2Speed(0)
         # If target position too high move motors down
         elif self.degrees2 > self.targetPos:
             print("M2 too high")
             self.setMotor2Direction("down")
-            self.setMotor2Speed(0)
 
     def setCameraHeight(self, position):
         if self.minPos <= position <= self.maxPos:
