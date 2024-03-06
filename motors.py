@@ -56,14 +56,13 @@ class cameraMount:
         self.motor1.start(0)
         self.motor2.start(0)
 
-    def motor1Callback(self, channel):
+    async def motor1Callback(self, channel):
         # Read motor encoder inputs
         blue = IO.input(self.BLUE1)
-        yellow = IO.input(self.YELLOW1)
         # Update motor position
-        if blue == yellow:
+        if blue:
             self.degrees1 += 1
-        elif not (blue == yellow):
+        else:
             self.degrees1 -= 1
         # print("Motor 1 Pos:", self.degrees1)
         '''
@@ -71,27 +70,25 @@ class cameraMount:
         '''
         # If target position is reached, stop motors
         if self.degrees1 == self.targetPos:
-            print("M1 at Target Position")
-            self.setMotor1Speed(0)
+            self.motor1.stop()
         # If target position too low move motors up
         elif self.degrees1 < self.targetPos:
-            print("M1 too low")
-            self.setMotor1Direction("up")
-            self.setMotor1Speed(30)
+            IO.output(self.M1_1, IO.LOW)
+            IO.output(self.M1_2, IO.HIGH)
+            self.motor1.start(30)
         # If target position too high move motors down
         elif self.degrees1 > self.targetPos:
-            print("M1 too high")
-            self.setMotor2Direction("down")
-            self.setMotor2Speed(30)
+            IO.output(self.M1_1, IO.HIGH)
+            IO.output(self.M1_2, IO.LOW)
+            self.motor1.start(30)
 
-    def motor2Callback(self, channel):
+    async def motor2Callback(self, channel):
         # Read motor encoder inputs
         blue = IO.input(self.BLUE2)
-        yellow = IO.input(self.YELLOW2)
         # Update motor position
-        if blue == yellow:
+        if blue:
             self.degrees2 += 1
-        elif not (blue == yellow):
+        else:
             self.degrees2 -= 1
         # print("Motor 2 Pos:", self.degrees2)
         '''
@@ -99,17 +96,16 @@ class cameraMount:
         '''
         # If target position is reached, stop motors
         if self.degrees2 == self.targetPos:
-            print("M2 at Target Position")
             self.motor2.stop()
         # If target position too low move motors up
         elif self.degrees2 < self.targetPos:
-            print("M2 too low")
-            self.setMotor2Direction("up")
+            IO.output(self.M2_1, IO.HIGH)
+            IO.output(self.M2_2, IO.LOW)
             self.motor2.start(30)
         # If target position too high move motors down
         elif self.degrees2 > self.targetPos:
-            print("M2 too high")
-            self.setMotor2Direction("down")
+            IO.output(self.M2_1, IO.LOW)
+            IO.output(self.M2_2, IO.HIGH)
             self.motor2.start(30)
 
     def setCameraHeight(self, position):
