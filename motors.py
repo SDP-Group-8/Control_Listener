@@ -115,8 +115,8 @@ class cameraMount:
     def setCameraHeight(self, position):
         if self.minPos <= position <= self.maxPos:
             self.targetPos = position
-            self.setMotor1Speed(100)
-            self.setMotor2Speed(100)
+            self.setMotor1Speed(10)
+            self.setMotor2Speed(10)
             self.setMotor1Direction("up")
             self.setMotor2Direction("up")
 
