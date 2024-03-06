@@ -1,10 +1,10 @@
 import RPi.GPIO as IO
 import time
 
-YELLOW1 = 26
-BLUE1 = 19
-YELLOW2 = 21
-BLUE2 = 20
+YELLOW2 = 26
+BLUE2 = 19
+YELLOW1 = 21
+BLUE1 = 20
 
 ENA = 13
 M1_1 = 5
@@ -49,6 +49,7 @@ motor2 = IO.PWM(ENB, 30)
 Motor Callbacks
 '''
 def motor1Callback(channel):
+    global degrees1
     # Read motor encoder inputs
     blue = IO.input(BLUE1)
     yellow = IO.input(YELLOW1)
@@ -59,6 +60,7 @@ def motor1Callback(channel):
         degrees1 -= 1
 
 def motor2Callback(channel):
+    global degrees2
     # Read motor encoder inputs
     blue = IO.input(BLUE2)
     yellow = IO.input(YELLOW2)
@@ -80,3 +82,5 @@ time.sleep(1)
 IO.output(M1_1, IO.HIGH)
 IO.output(M1_2, IO.LOW)
 motor1.start(100)
+time.sleep(1)
+motor1.stop()
