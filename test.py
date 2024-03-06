@@ -50,6 +50,7 @@ Motor Callbacks
 '''
 def motor1Callback(channel):
     global degrees1
+    print("M1 Pos:", degrees1)
     # Read motor encoder inputs
     blue = IO.input(BLUE1)
     yellow = IO.input(YELLOW1)
@@ -61,6 +62,7 @@ def motor1Callback(channel):
 
 def motor2Callback(channel):
     global degrees2
+    print(":M2 Pos:", degrees2)
     # Read motor encoder inputs
     blue = IO.input(BLUE2)
     yellow = IO.input(YELLOW2)
