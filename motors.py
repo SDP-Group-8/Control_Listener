@@ -126,13 +126,13 @@ class cameraMount:
     '''
     Utility Functions for setting motor direction
     '''
-    def setMotor1Speed(self, speed):
+    async def setMotor1Speed(self, speed):
         self.motor1.ChangeDutyCycle(speed)
 
-    def setMotor2Speed(self, speed):
+    async def setMotor2Speed(self, speed):
         self.motor2.ChangeDutyCycle(speed)
 
-    def setMotor1Direction(self, direction):
+    async def setMotor1Direction(self, direction):
         if direction == "down":
             IO.output(self.M1_1, IO.HIGH)
             IO.output(self.M1_2, IO.LOW)
@@ -142,7 +142,7 @@ class cameraMount:
         else:
             print("Invalid Direction Input")
 
-    def setMotor2Direction(self, direction):
+    async def setMotor2Direction(self, direction):
         if direction == "up":
             IO.output(self.M2_1, IO.LOW)
             IO.output(self.M2_2, IO.HIGH)
