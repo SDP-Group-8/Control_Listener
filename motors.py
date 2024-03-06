@@ -6,10 +6,10 @@ class cameraMount:
         '''
         GPIO Pin Numbers Config
         '''
-        self.YELLOW1 = 26
-        self.BLUE1 = 19
-        self.YELLOW2 = 21
-        self.BLUE2 = 20
+        self.YELLOW2 = 26
+        self.BLUE2 = 19
+        self.YELLOW1 = 21
+        self.BLUE1 = 20
 
         self.ENA = 13
         self.M1_1 = 5
@@ -77,12 +77,12 @@ class cameraMount:
         elif self.degrees1 < self.targetPos:
             print("M1 too low")
             self.setMotor1Direction("up")
-            self.setMotor1Speed(0)
+            self.setMotor1Speed(30)
         # If target position too high move motors down
         elif self.degrees1 > self.targetPos:
             print("M1 too high")
             self.setMotor2Direction("down")
-            self.setMotor2Speed(0)
+            self.setMotor2Speed(30)
 
     def motor2Callback(self, channel):
         # Read motor encoder inputs
