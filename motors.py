@@ -137,8 +137,8 @@ class cameraMount:
     def setMotor1Direction(self, direction):
         print("Direction Changed")
         if direction == "up":
-            IO.output(self.M1_1, IO.HIGH)
-            IO.output(self.M1_2, IO.LOW)
+            IO.output(self.M1_1, IO.LOW)
+            IO.output(self.M1_2, IO.HIGH)
         elif direction == "down":
             IO.output(self.M1_1, IO.LOW)
             IO.output(self.M1_2, IO.HIGH)
