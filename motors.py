@@ -137,10 +137,10 @@ class cameraMount:
             print("Invalid Direction Input")
 
     def setMotor2Direction(self, direction):
-        if direction == "down":
+        if direction == "up":
             IO.output(self.M2_1, IO.LOW)
             IO.output(self.M2_2, IO.HIGH)
-        elif direction == "up":
+        elif direction == "down":
             IO.output(self.M2_1, IO.HIGH)
             IO.output(self.M2_2, IO.LOW)
         else:
