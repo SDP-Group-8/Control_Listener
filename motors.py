@@ -104,37 +104,9 @@ class cameraMount:
             self.setMotor2Direction("down")
             self.setMotor2Speed(100)
 
-    def moveMotors(self, degrees):
-        targetPos = self.degrees1 + degrees
-        if 0 <= targetPos <= 134:
-            self.targetPos1 = targetPos
-            self.targetPos2 = targetPos
-            print("Target Position:", targetPos)
-            if degrees > 0:
-                print("Moving Forwards")
-                self.motor1_1.start(100)
-                self.motor1_2.start(0)
-                self.motor2_1.start(100)
-                self.motor2_2.start(0)
-            elif degrees < 0:
-                print("Moving Backwards")
-                self.motor1_1.start(0)
-                self.motor1_2.start(100)
-                self.motor2_1.start(0)
-                self.motor2_2.start(100)
-            else:
-                print("Invalid degrees")
-            
-            while self.targetPos1 and self.targetPos2:
-                print("Moving...")
-                time.sleep(0.5)
-            print("Done Moving")
-        else: 
-            print("Degrees out of range or invalid")
-
     def setCameraHeight(self, position):
         if self.minPos <= position <= self.maxPos:
-            self.targetPos1 = position
+            self.targetPos = position
             self.setMotor1Speed(100)
             self.setMotor2Speed(100)
             self.setMotor1Direction("up")
