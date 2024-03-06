@@ -65,6 +65,7 @@ class cameraMount:
             self.degrees1 += 1
         elif not (blue == yellow):
             self.degrees1 -= 1
+        print("Motor 1 Pos:", self.degrees1)
         '''
         Move motors accordingly to target position
         '''
@@ -89,6 +90,7 @@ class cameraMount:
             self.degrees2 += 1
         elif not (blue == yellow):
             self.degrees2 -= 1
+        print("Motor 2 Pos:", self.degrees2)
         '''
         Move motors accordingly to target position
         '''
