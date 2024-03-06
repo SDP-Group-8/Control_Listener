@@ -44,6 +44,8 @@ class cameraMount:
         IO.add_event_detect(self.YELLOW1, IO.RISING, callback=self.motor1Callback, bouncetime=30)
         IO.add_event_detect(self.YELLOW2, IO.RISING, callback=self.motor2Callback, bouncetime=30)
 
+        IO.setup(self.ENA, IO.OUT)
+        IO.setup(self.ENB, IO.OUT)
         IO.setup(self.M1_1, IO.OUT)
         IO.setup(self.M1_2, IO.OUT)
         IO.setup(self.M2_1, IO.OUT)
