@@ -57,7 +57,7 @@ class cameraMount:
         self.motor1.start(0)
         self.motor2.start(0)
 
-    def motor1Callback(self):
+    def motor1Callback(self, channel):
         # Read motor encoder inputs
         blue = IO.input(self.BLUE1)
         yellow = IO.input(self.YELLOW1)
@@ -71,8 +71,7 @@ class cameraMount:
         '''
         # If target position is reached, stop motors
         if self.degrees1 == self.targetPos1:
-            self.motor1.setspeed(0)
-            self.motor1.setspeed(0)
+            self.setMotor1Speed(0)
         # If target position too low move motors up
         elif self.degrees1 < self.targetPos1:
             self.setMotor1Direction("up")
@@ -82,7 +81,7 @@ class cameraMount:
             self.setMotor2Direction("down")
             self.setMotor2Speed(100)
 
-    def motor2Callback(self):
+    def motor2Callback(self, channel):
         # Read motor encoder inputs
         blue = IO.input(self.BLUE2)
         yellow = IO.input(self.YELLOW2)
@@ -96,8 +95,7 @@ class cameraMount:
         '''
         # If target position is reached, stop motors
         if self.degrees2 == self.targetPos2:
-            self.motor2.setspeed(0)
-            self.motor2.setspeed(0)
+            self.setMotor2Speed(0)
         # If target position too low move motors up
         elif self.degrees2 < self.targetPos2:
             self.setMotor2Direction("up")
