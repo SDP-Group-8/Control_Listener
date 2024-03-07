@@ -78,11 +78,14 @@ class cameraMount:
         if abs(self.targetPos - self.degrees1) < self.tolerance:
             print("Stopped")
             self.motor1.stop()
+            print("motor1stop")
             self.motor2.stop()
+            print("motor2stop")
         elif self.degrees1 < self.targetPos:
             IO.output(self.M1_1, IO.LOW)
             IO.output(self.M1_2, IO.HIGH)
             self.motor1.start(self.motorSpeed)
+    
 
             IO.output(self.M2_1, IO.HIGH)
             IO.output(self.M2_2, IO.LOW)
