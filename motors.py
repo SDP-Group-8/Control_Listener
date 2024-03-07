@@ -103,6 +103,7 @@ class cameraMount:
         '''
         Move motors accordingly to target position
         '''
+        self.motor_speed = self.pid_controller(self.degrees1)
         # If target position is reached, stop motors
         if abs(self.targetPos - self.degrees2) < self.tolerance:
             self.motor2.stop()
