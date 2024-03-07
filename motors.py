@@ -74,6 +74,7 @@ class cameraMount:
             self.motor1_position -= 1
         
         self.motor_speed = self.pid(self.motor1_position)
+        print(self.motor1_position, self.motor_speed)
 
         # Stop when motor is within a tolerance of the target position
         if abs(self.motor1_position - self.targetPos) <= self.tolerance:
@@ -167,3 +168,5 @@ class cameraMount:
 if __name__ == '__main__':
     c = cameraMount()
     c.setCameraHeight(100)
+    c.motor1.stop()
+    c.motor2.stop()
