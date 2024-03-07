@@ -104,7 +104,7 @@ class cameraMount:
         Move motors accordingly to target position
         '''
         # If target position is reached, stop motors
-        if self.targetPos == self.degrees2:
+        if abs(self.targetPos - self.degrees2) < self.tolerance:
             self.motor2.stop()
         # If target position too low move motors up
         elif self.degrees2 < self.targetPos:
