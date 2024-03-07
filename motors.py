@@ -78,15 +78,24 @@ class cameraMount:
         if abs(self.targetPos - self.degrees1) < self.tolerance:
             print("Stopped")
             self.motor1.stop()
+            self.motor2.stop()
         elif self.degrees1 < self.targetPos:
             IO.output(self.M1_1, IO.LOW)
             IO.output(self.M1_2, IO.HIGH)
             self.motor1.start(self.motorSpeed)
+
+            IO.output(self.M2_1, IO.HIGH)
+            IO.output(self.M2_2, IO.LOW)
+            self.motor1.start(self.motorSpeed)
         # If target position too high move motors down
         elif self.degrees1 > self.targetPos:
-            IO.output(self.M1_1, IO.HIGH)
+            IO.output(self.M1_2, IO.HIGH)
             IO.output(self.M1_2, IO.LOW)
             self.motor1.start(self.motorSpeed)
+
+            IO.output(self.M2_2, IO.LOW)
+            IO.output(self.M2_2, IO.HIGH)
+            self.motor2.start(self.motorSpeed)
 
 
         
@@ -127,9 +136,9 @@ class cameraMount:
     def setCameraHeight(self):
         if self.minPos <= self.targetPos <= self.maxPos:
             self.setMotor1Speed(self.motorSpeed)
-            self.setMotor2Speed(self.motorSpeed)
+            # self.setMotor2Speed(self.motorSpeed)
             self.setMotor1Direction("up")
-            self.setMotor2Direction("up")
+            # self.setMotor2Direction("up")
 
         else:
             print("Invalid Position Input")
