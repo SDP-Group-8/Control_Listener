@@ -1,7 +1,6 @@
 import time
 import RPi.GPIO as IO
 from simple_pid import PID 
-from math import abs
 
 class cameraMount:
     def __init__(self):
