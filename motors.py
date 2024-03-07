@@ -76,7 +76,7 @@ class cameraMount:
         print(self.motor1_position, self.motor_speed)
 
         # If target position is reached, stop motors
-        if self.targetPos == self.motor2_position:
+        if self.targetPos == -self.motor2_position:
             self.motor2.stop()
 
         elif self.motor2_position < self.targetPos:
@@ -125,7 +125,7 @@ class cameraMount:
             self.pid_controller.set_endpoint = position
             self.setMotor1Speed(self.motorSpeed)
             # self.setMotor2Speed(self.motorSpeed)
-            self.setMotor1Direction("down")
+            self.setMotor1Direction("up")
             # self.setMotor2Direction("up")
 
         else:
