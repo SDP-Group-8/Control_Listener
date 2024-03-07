@@ -75,12 +75,14 @@ class cameraMount:
         self.motor_speed = self.pid_controller(self.degrees1)
         print(self.degrees1, self.motor_speed)
 
-        if self.degrees1 < self.targetPos:
+        if self.degrees1 == self.targetPos:
+            self.motor1.stop()
+        elif self.degrees1 < self.targetPos:
             IO.output(self.M1_1, IO.LOW)
             IO.output(self.M1_2, IO.HIGH)
             self.motor1.start(self.motorSpeed)
         # If target position too high move motors down
-        if self.degrees1 > self.targetPos:
+        elif self.degrees1 > self.targetPos:
             IO.output(self.M1_1, IO.HIGH)
             IO.output(self.M1_2, IO.LOW)
             self.motor1.start(self.motorSpeed)
