@@ -26,7 +26,7 @@ class cameraMount:
         self.degrees2 = 0
 
         self.minPos = 0
-        self.maxPos = 134
+        self.maxPos = 134 + 100
         self.motorSpeed = 100
 
         self.targetPos = 0
