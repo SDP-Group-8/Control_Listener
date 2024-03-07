@@ -31,7 +31,7 @@ class cameraMount:
 
         self.targetPos = 0
 
-        self.tolerance = 0.1
+        self.tolerance = 0.03
         self.pid_controller = PID(0.5, 0.01, 0.05, setpoint=self.targetPos)
         # PID bounds set so controller can half the speed of the motor.
         self.pid_controller.output_limits = (0, self.motorSpeed) 
@@ -75,7 +75,7 @@ class cameraMount:
         self.motor_speed = self.pid_controller(self.degrees1)
         print(self.degrees1, self.motor_speed)
 
-        if self.degrees1 == self.targetPos:
+        if abs(self.targetPos - self.degrees1) < self.tolerance:
             self.motor1.stop()
         elif self.degrees1 < self.targetPos:
             IO.output(self.M1_1, IO.LOW)
