@@ -34,7 +34,7 @@ class cameraMount:
         self.tolerance = 5 # In degrees
         self.pid_controller = PID(1.0, 0.01, 0.05, setpoint=self.targetPos)
         # PID bounds set so controller can half the speed of the motor.
-        self.pid_controller.output_limits = (0, 200) 
+        self.pid_controller.output_limits = (0, 100) 
 
         '''
         GPIO Setup
