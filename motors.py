@@ -169,7 +169,7 @@ class cameraMount:
 if __name__ == '__main__':
     try:
         c = cameraMount(185)
-        c.setCameraHeight(160)
+        c.setCameraHeight()
         time.sleep(20)
         c.motor1.stop()
         c.motor2.stop()
