@@ -3,7 +3,7 @@ import RPi.GPIO as IO
 from simple_pid import PID 
 
 class cameraMount:
-    def __init__(self):
+    def __init__(self, pos):
         '''
         GPIO Pin Numbers Config
         '''
@@ -29,7 +29,7 @@ class cameraMount:
         self.maxPos = 134 + 1000
         self.motorSpeed = 100    
 
-        self.targetPos = 0
+        self.targetPos = pos
 
         self.tolerance = 5 # In degrees
         self.pid_controller = PID(0.5, 0.01, 0.05, setpoint=self.targetPos)
@@ -103,7 +103,7 @@ class cameraMount:
         '''
         Move motors accordingly to target position
         '''
-        self.motorSpeed = self.pid_controller(self.degrees1)
+        self.motorSpeed = self.pid_controller(self.degrees2)
         # If target position is reached, stop motors
         if abs(self.targetPos - self.degrees2) < self.tolerance:
             self.motor2.stop()
@@ -120,7 +120,6 @@ class cameraMount:
 
     def setCameraHeight(self, position):
         if self.minPos <= position <= self.maxPos:
-            self.targetPos = position
             self.pid_controller.set_endpoint = position
             self.setMotor1Speed(self.motorSpeed)
             self.setMotor2Speed(self.motorSpeed)
@@ -165,7 +164,7 @@ class cameraMount:
 
 if __name__ == '__main__':
     try:
-        c = cameraMount()
+        c = cameraMount(185)
         c.setCameraHeight(185)
         time.sleep(20)
         c.motor1.stop()
