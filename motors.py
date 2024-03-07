@@ -72,7 +72,7 @@ class cameraMount:
         else:
             self.degrees1 -= 1
         
-        # self.motorSpeed = self.pid_controller(self.degrees1)
+        self.motorSpeed = self.pid_controller(self.degrees1)
         print(self.degrees1, self.motorSpeed)
 
         if abs(self.targetPos - self.degrees1) < self.tolerance:
@@ -103,7 +103,7 @@ class cameraMount:
         '''
         Move motors accordingly to target position
         '''
-        # self.motorSpeed = self.pid_controller(self.degrees2)
+        self.motorSpeed = self.pid_controller(self.degrees2)
         # If target position is reached, stop motors
         if abs(self.targetPos - self.degrees2) < self.tolerance:
             self.motor2.stop()
