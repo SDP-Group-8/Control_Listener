@@ -72,7 +72,7 @@ class cameraMount:
         else:
             self.motor1_position -= 1
         
-        self.motor_speed = self.pid(self.motor1_position)
+        self.motor_speed = self.pid_controller(self.motor1_position)
         print(self.motor1_position, self.motor_speed)
 
         # Stop when motor is within a tolerance of the target position
