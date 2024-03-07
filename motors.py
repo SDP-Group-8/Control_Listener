@@ -57,8 +57,8 @@ class cameraMount:
         IO.setup(self.M2_1, IO.OUT)
         IO.setup(self.M2_2, IO.OUT)
 
-        self.motor1 = IO.PWM(self.ENB, 500)
-        self.motor2 = IO.PWM(self.ENA, 500)
+        self.motor1 = IO.PWM(self.ENA, 500)
+        self.motor2 = IO.PWM(self.ENB, 500)
 
         self.motor1.start(0)
         self.motor2.start(0)
