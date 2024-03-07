@@ -104,6 +104,8 @@ class cameraMount:
         Move motors accordingly to target position
         '''
         self.motorSpeed = self.pid_controller(self.degrees2)
+
+        
         # If target position is reached, stop motors
         if abs(self.targetPos - self.degrees2) < self.tolerance:
             self.motor2.stop()
@@ -118,9 +120,11 @@ class cameraMount:
             IO.output(self.M2_2, IO.HIGH)
             self.motor2.start(self.motorSpeed)
 
-    def setCameraHeight(self, position):
-        if self.minPos <= position <= self.maxPos:
-            self.pid_controller.set_endpoint = position
+
+
+
+    def setCameraHeight(self):
+        if self.minPos <= self.targetPos <= self.maxPos:
             self.setMotor1Speed(self.motorSpeed)
             self.setMotor2Speed(self.motorSpeed)
             self.setMotor1Direction("up")
