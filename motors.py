@@ -22,8 +22,8 @@ class cameraMount:
         '''
         Setup Variables
         '''
-        self.motor1_position = 0
-        self.motor2_position = 0
+        self.degrees1 = 0
+        self.degrees2 = 0
 
         self.minPos = 0
         self.maxPos = 134
@@ -68,12 +68,12 @@ class cameraMount:
         blue = IO.input(self.BLUE1)
         # Update motor position
         if blue:
-            self.motor1_position += 1
+            self.degrees1 += 1
         else:
-            self.motor1_position -= 1
+            self.degrees1 -= 1
         
-        self.motor_speed = self.pid_controller(self.motor1_position)
-        print(self.motor1_position, self.motor_speed)
+        self.motor_speed = self.pid_controller(self.degrees1)
+        print(self.degrees1, self.motor_speed)
 
         if self.degrees1 < self.targetPos:
             IO.output(self.M1_1, IO.LOW)
@@ -94,23 +94,23 @@ class cameraMount:
         blue = IO.input(self.BLUE2)
         # Update motor position
         if blue:
-            self.motor2_position += 1
+            self.degrees2 += 1
         else:
-            self.motor2_position -= 1
+            self.degrees2 -= 1
         # print("Motor 2 Pos:", self.degrees2)
         '''
         Move motors accordingly to target position
         '''
         # If target position is reached, stop motors
-        if self.targetPos == self.motor2_position:
+        if self.targetPos == self.degrees2:
             self.motor2.stop()
         # If target position too low move motors up
-        elif self.motor2_position < self.targetPos:
+        elif self.degrees2 < self.targetPos:
             IO.output(self.M2_1, IO.HIGH)
             IO.output(self.M2_2, IO.LOW)
             self.motor2.start(self.motorSpeed)
         # If target position too high move motors down
-        elif self.motor2_position > self.targetPos:
+        elif self.degrees2 > self.targetPos:
             IO.output(self.M2_1, IO.LOW)
             IO.output(self.M2_2, IO.HIGH)
             self.motor2.start(self.motorSpeed)
