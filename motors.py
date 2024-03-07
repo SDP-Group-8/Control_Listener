@@ -32,7 +32,7 @@ class cameraMount:
         self.targetPos = pos
 
         self.tolerance = 5 # In degrees
-        self.pid_controller = PID(0.8, 0.4, 0.9, setpoint=self.targetPos)
+        self.pid_controller = PID(0.85, 0.5, 0.9, setpoint=self.targetPos)
         # PID bounds set so controller can half the speed of the motor.
         self.pid_controller.output_limits = (0, 100) 
 
