@@ -1,5 +1,7 @@
 import time
 import RPi.GPIO as IO
+from simple_pid import PID 
+from math import abs
 
 class cameraMount:
     def __init__(self):
@@ -21,14 +23,19 @@ class cameraMount:
         '''
         Setup Variables
         '''
-        self.degrees1 = 0
-        self.degrees2 = 0
+        self.motor1_position = 0
+        self.motor2_position = 0
 
         self.minPos = 0
         self.maxPos = 134
         self.motorSpeed = 100
 
         self.targetPos = 0
+
+        self.tolerance = 0.1
+        self.pid_controller = PID(0.5, 0.01, 0.05, setpoint=self.targetPos)
+        # PID bounds set so controller can half the speed of the motor.
+        self.pid_controller.output_limits = (self.motorSpeed // 2, self.motorSpeed) 
 
         '''
         GPIO Setup
@@ -62,49 +69,52 @@ class cameraMount:
         blue = IO.input(self.BLUE1)
         # Update motor position
         if blue:
-            self.degrees1 += 1
+            self.motor1_position += 1
         else:
-            self.degrees1 -= 1
-        # print("Motor 1 Pos:", self.degrees1)
-        '''
-        Move motors accordingly to target position
-        '''
-        # If target position is reached, stop motors
-        if self.targetPos == self.degrees1:
+            self.motor1_position -= 1
+        
+        self.motor_speed = self.pid(self.motor1_position)
+
+        # Stop when motor is within a tolerance of the target position
+        if abs(self.motor1_position - self.targetPos) <= self.tolerance:
             self.motor1.stop()
-        # If target position too low move motors up
-        elif self.degrees1 < self.targetPos:
-            IO.output(self.M1_1, IO.LOW)
-            IO.output(self.M1_2, IO.HIGH)
-            self.motor1.start(self.motorSpeed)
-        # If target position too high move motors down
-        elif self.degrees1 > self.targetPos:
+
+        elif self.motor2_position < self.targetPos:
             IO.output(self.M1_1, IO.HIGH)
             IO.output(self.M1_2, IO.LOW)
             self.motor1.start(self.motorSpeed)
+        # If target position too high move motors down
+        elif self.motor2_position > self.targetPos:
+            IO.output(self.M1_1, IO.LOW)
+            IO.output(self.M1_2, IO.HIGH)
+            self.motor1.start(self.motorSpeed)
+
+
+        
+
 
     def motor2Callback(self, channel):
         # Read motor encoder inputs
         blue = IO.input(self.BLUE2)
         # Update motor position
         if blue:
-            self.degrees2 += 1
+            self.motor2_position += 1
         else:
-            self.degrees2 -= 1
+            self.motor2_position -= 1
         # print("Motor 2 Pos:", self.degrees2)
         '''
         Move motors accordingly to target position
         '''
         # If target position is reached, stop motors
-        if self.targetPos == self.degrees2:
+        if self.targetPos == self.motor2_position:
             self.motor2.stop()
         # If target position too low move motors up
-        elif self.degrees2 < self.targetPos:
+        elif self.motor2_position < self.targetPos:
             IO.output(self.M2_1, IO.HIGH)
             IO.output(self.M2_2, IO.LOW)
             self.motor2.start(self.motorSpeed)
         # If target position too high move motors down
-        elif self.degrees2 > self.targetPos:
+        elif self.motor2_position > self.targetPos:
             IO.output(self.M2_1, IO.LOW)
             IO.output(self.M2_2, IO.HIGH)
             self.motor2.start(self.motorSpeed)
@@ -112,6 +122,7 @@ class cameraMount:
     def setCameraHeight(self, position):
         if self.minPos <= position <= self.maxPos:
             self.targetPos = position
+            self.pid_controller.set_endpoint = position
             self.setMotor1Speed(self.motorSpeed)
             self.setMotor2Speed(self.motorSpeed)
             self.setMotor1Direction("up")
@@ -152,3 +163,7 @@ class cameraMount:
             IO.output(self.M2_2, IO.HIGH)
         else:
             print("Invalid Direction Input")
+
+if __name__ == '__main__':
+    c = cameraMount()
+    c.setCameraHeight(100)
