@@ -86,7 +86,7 @@ class cameraMount:
 
             IO.output(self.M2_1, IO.HIGH)
             IO.output(self.M2_2, IO.LOW)
-            self.motor1.start(self.motorSpeed)
+            self.motor2.start(self.motorSpeed)
         # If target position too high move motors down
         elif self.degrees1 > self.targetPos:
             IO.output(self.M1_2, IO.HIGH)
