@@ -26,7 +26,7 @@ class cameraMount:
         self.degrees2 = 0
 
         self.minPos = 0
-        self.maxPos = 134 + 100
+        self.maxPos = 134 + 1000
         self.motorSpeed = 100
 
         self.targetPos = 0
@@ -166,7 +166,7 @@ class cameraMount:
 if __name__ == '__main__':
     try:
         c = cameraMount()
-        c.setCameraHeight(100)
+        c.setCameraHeight(250)
         time.sleep(20)
         c.motor1.stop()
         c.motor2.stop()
