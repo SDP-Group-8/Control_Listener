@@ -125,7 +125,7 @@ class cameraMount:
             self.pid_controller.set_endpoint = position
             self.setMotor1Speed(self.motorSpeed)
             # self.setMotor2Speed(self.motorSpeed)
-            self.setMotor1Direction("up")
+            self.setMotor1Direction("down")
             # self.setMotor2Direction("up")
 
         else:
