@@ -32,8 +32,8 @@ class cameraMount:
         self.targetPos = pos
 
         self.tolerance = 7 # In degrees
-        self.motor1pid = PID(1.0, 0.9, 1.0, setpoint=self.targetPos)
-        self.motor2pid = PID(1.0, 0.9, 1.0, setpoint=self.degrees1)
+        self.motor1pid = PID(1, 0, 0, setpoint=self.targetPos)
+        self.motor2pid = PID(1, 0, 0, setpoint=self.degrees1)
         # PID bounds set so controller can half the speed of the motor.
         self.motor1pid.output_limits = (-100, 100)
         self.motor2pid.output_limits = (-100, 100)
@@ -74,7 +74,7 @@ class cameraMount:
         else:
             self.degrees1 -= 1
         # Update target position for motor 2
-        self.motor2pid.setpoint = self.degrees1``
+        self.motor2pid.setpoint = self.degrees1
         # Get PID output and set motor speed accordingly
         motor1Speed = self.motor1pid(self.degrees1)
         self.setMotor1Speed(abs(motor1Speed))
