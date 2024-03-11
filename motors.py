@@ -32,8 +32,8 @@ class cameraMount:
         self.targetPos = pos
 
         self.tolerance = 7 # In degrees
-        self.motor1pid = PID(1, 0, 0, setpoint=self.targetPos)
-        self.motor2pid = PID(1, 0, 0, setpoint=self.degrees1)
+        self.motor1pid = PID(20, 0.5, 0, setpoint=self.targetPos)
+        self.motor2pid = PID(20, 0.5, 0, setpoint=self.degrees1)
         # PID bounds set so controller can half the speed of the motor.
         self.motor1pid.output_limits = (-100, 100)
         self.motor2pid.output_limits = (-100, 100)
@@ -79,9 +79,9 @@ class cameraMount:
         motor1Speed = self.motor1pid(self.degrees1)
         self.setMotor1Speed(abs(motor1Speed))
         if motor1Speed <= 0:
-            self.setMotor1Direction("down")
-        elif motor1Speed > 0:
             self.setMotor1Direction("up")
+        elif motor1Speed > 0:
+            self.setMotor1Direction("down")
         # print(self.degrees1, motor1Speed)
 
         # if abs(self.targetPos - self.degrees1) < self.tolerance:
