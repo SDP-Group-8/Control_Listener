@@ -74,7 +74,7 @@ class cameraMount:
         else:
             self.degrees1 -= 1
         # Update target position for motor 2
-        self.motor2pid.setpoint = self.degrees1
+        self.motor2pid.setpoint = self.degrees1``
         # Get PID output and set motor speed accordingly
         motor1Speed = self.motor1pid(self.degrees1)
         self.setMotor1Speed(abs(motor1Speed))
@@ -82,7 +82,7 @@ class cameraMount:
             self.setMotor1Direction("up")
         elif motor1Speed > 0:
             self.setMotor1Direction("down")
-        print(self.degrees1, motor1Speed)
+        # print(self.degrees1, motor1Speed)
 
         # if abs(self.targetPos - self.degrees1) < self.tolerance:
         #     print("Stopped")
@@ -126,13 +126,13 @@ class cameraMount:
         Move motors accordingly to target position
         '''
         # Get PID output and set motor speed accordingly
-        motor2Speed = self.motor1pid(self.degrees2)
-        self.setMotor2Speed(abs(motor2Speed))
-        if motor2Speed <= 0:
-            self.setMotor2Direction("up")
-        elif motor2Speed > 0:
-            self.setMotor2Direction("down")
-        print(self.degrees2, motor2Speed)
+        # motor2Speed = self.motor1pid(self.degrees2)
+        # self.setMotor2Speed(abs(motor2Speed))
+        # if motor2Speed <= 0:
+        #     self.setMotor2Direction("up")
+        # elif motor2Speed > 0:
+        #     self.setMotor2Direction("down")
+        # print(self.degrees2, motor2Speed)
         # self.motorSpeed = self.pid_controller(self.degrees2)
 
         
