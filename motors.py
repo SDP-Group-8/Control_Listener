@@ -3,7 +3,7 @@ import RPi.GPIO as IO
 from simple_pid import PID 
 
 class cameraMount:
-    def __init__(self, pos):
+    def __init__(self, pos = 0):
         '''
         GPIO Pin Numbers Config
         '''
@@ -32,9 +32,11 @@ class cameraMount:
         self.targetPos = pos
 
         self.tolerance = 7 # In degrees
-        self.pid_controller = PID(1.0, 0.9, 1.0, setpoint=self.targetPos)
+        self.motor1pid = PID(1.0, 0.9, 1.0, setpoint=self.targetPos)
+        self.motor2pid = PID(1.0, 0.9, 1.0, setpoint=self.degrees1)
         # PID bounds set so controller can half the speed of the motor.
-        self.pid_controller.output_limits = (0, 100) 
+        self.motor1pid.output_limits = (-100, 100)
+        self.motor2pid.output_limits = (-100, 100)
 
         '''
         GPIO Setup
@@ -71,34 +73,41 @@ class cameraMount:
             self.degrees1 += 1
         else:
             self.degrees1 -= 1
-        
-        # self.motorSpeed = self.pid_controller(self.degrees1)
-        print(self.degrees1, self.motorSpeed)
+        # Update target position for motor 2
+        self.motor2pid.setpoint = self.degrees1
+        # Get PID output and set motor speed accordingly
+        motor1Speed = self.motor1pid(self.degrees1)
+        self.setMotor1Speed(abs(motor1Speed))
+        if motor1Speed <= 0:
+            self.setMotor1Direction("up")
+        elif motor1Speed > 0:
+            self.setMotor1Direction("down")
+        print(self.degrees1, motor1Speed)
 
-        if abs(self.targetPos - self.degrees1) < self.tolerance:
-            print("Stopped")
-            self.motor1.stop()
-            print("motor1stop", time.time())
-            self.motor2.stop()
-            print("motor2stop", time.time())
-        elif self.degrees1 < self.targetPos:
-            IO.output(self.M1_1, IO.LOW)
-            IO.output(self.M1_2, IO.HIGH)
-            self.motor1.start(self.motorSpeed)
+        # if abs(self.targetPos - self.degrees1) < self.tolerance:
+        #     print("Stopped")
+        #     self.motor1.stop()
+        #     print("motor1stop", time.time())
+        #     self.motor2.stop()
+        #     print("motor2stop", time.time())
+        # elif self.degrees1 < self.targetPos:
+        #     IO.output(self.M1_1, IO.LOW)
+        #     IO.output(self.M1_2, IO.HIGH)
+        #     self.motor1.start(self.motorSpeed)
     
 
-            IO.output(self.M2_1, IO.HIGH)
-            IO.output(self.M2_2, IO.LOW)
-            self.motor2.start(self.motorSpeed)
-        # If target position too high move motors down
-        elif self.degrees1 > self.targetPos:
-            IO.output(self.M1_2, IO.HIGH)
-            IO.output(self.M1_2, IO.LOW)
-            self.motor1.start(self.motorSpeed)
+        #     IO.output(self.M2_1, IO.HIGH)
+        #     IO.output(self.M2_2, IO.LOW)
+        #     self.motor2.start(self.motorSpeed)
+        # # If target position too high move motors down
+        # elif self.degrees1 > self.targetPos:
+        #     IO.output(self.M1_2, IO.HIGH)
+        #     IO.output(self.M1_2, IO.LOW)
+        #     self.motor1.start(self.motorSpeed)
 
-            IO.output(self.M2_2, IO.LOW)
-            IO.output(self.M2_2, IO.HIGH)
-            self.motor2.start(self.motorSpeed)
+        #     IO.output(self.M2_2, IO.LOW)
+        #     IO.output(self.M2_2, IO.HIGH)
+        #     self.motor2.start(self.motorSpeed)
 
 
         
@@ -116,33 +125,37 @@ class cameraMount:
         '''
         Move motors accordingly to target position
         '''
+        # Get PID output and set motor speed accordingly
+        motor2Speed = self.motor1pid(self.degrees2)
+        self.setMotor2Speed(abs(motor2Speed))
+        if motor2Speed <= 0:
+            self.setMotor2Direction("up")
+        elif motor2Speed > 0:
+            self.setMotor2Direction("down")
+        print(self.degrees2, motor2Speed)
         # self.motorSpeed = self.pid_controller(self.degrees2)
 
         
-        # If target position is reached, stop motors
-        if abs(self.targetPos - self.degrees2) < self.tolerance:
-            self.motor2.stop()
-        # If target position too low move motors up
-        elif self.degrees2 < self.targetPos:
-            IO.output(self.M2_1, IO.HIGH)
-            IO.output(self.M2_2, IO.LOW)
-            self.motor2.start(self.motorSpeed)
-        # If target position too high move motors down
-        elif self.degrees2 > self.targetPos:
-            IO.output(self.M2_1, IO.LOW)
-            IO.output(self.M2_2, IO.HIGH)
-            self.motor2.start(self.motorSpeed)
+        # # If target position is reached, stop motors
+        # if abs(self.targetPos - self.degrees2) < self.tolerance:
+        #     self.motor2.stop()
+        # # If target position too low move motors up
+        # elif self.degrees2 < self.targetPos:
+        #     IO.output(self.M2_1, IO.HIGH)
+        #     IO.output(self.M2_2, IO.LOW)
+        #     self.motor2.start(self.motorSpeed)
+        # # If target position too high move motors down
+        # elif self.degrees2 > self.targetPos:
+        #     IO.output(self.M2_1, IO.LOW)
+        #     IO.output(self.M2_2, IO.HIGH)
+        #     self.motor2.start(self.motorSpeed)
 
 
 
-
-    def setCameraHeight(self):
-        if self.minPos <= self.targetPos <= self.maxPos:
-            self.setMotor1Speed(self.motorSpeed)
-            # self.setMotor2Speed(self.motorSpeed)
-            self.setMotor1Direction("up")
-            # self.setMotor2Direction("up")
-
+    # Set the camera height target in the PID controller 
+    def setCameraHeight(self, targetPos):
+        if self.minPos <= targetPos <= self.maxPos:
+            self.motor1pid.setpoint = targetPos
         else:
             print("Invalid Position Input")
 
