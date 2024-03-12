@@ -1,4 +1,4 @@
-from motors import cameraMount
+from motors_asymetric import cameraMount
 import time
 
 def main():

@@ -22,17 +22,25 @@ class cameraMount:
         '''
         Setup Variables
         '''
-        self.degrees = 0
+        self.degrees1 = 0
+        self.degrees2 = 0
 
         self.minPos = 0
         self.maxPos = 134 + 1000
-        self.motorSpeed = 80 
+        self.motorSpeed = 20 
+
+        self.Kp = 15
+        self.Ki = 10
+        self.Kd = 2
 
         self.targetPos = None
-        self.motor1pid = PID(90, 10, 0, setpoint=self.targetPos)
+        self.motor1pid = PID(self.Kp, self.Ki, self.Kd)
+        self.motor2pid = PID(self.Kp, self.Ki, self.Kd)
 
         # PID bounds set so controller can half the speed of the motor.
-        self.motor1pid.output_limits = (-100, 100)
+        self.motor1pid.output_limits = (-100, 70)
+        self.motor2pid.output_limits = (-100, 70)
+
 
         '''
         GPIO Setup
@@ -45,7 +53,7 @@ class cameraMount:
         IO.setup(self.YELLOW2, IO.IN, pull_up_down=IO.PUD_DOWN)
         IO.setup(self.BLUE2, IO.IN, pull_up_down=IO.PUD_DOWN)
 
-        IO.add_event_detect(self.YELLOW1, IO.RISING, callback=self.motor1Callback, bouncetime=10)
+        IO.add_event_detect(self.YELLOW1, IO.RISING, callback=self.motor1Callback, bouncetime=5)
         IO.add_event_detect(self.YELLOW2, IO.RISING, callback=self.motor2Callback, bouncetime=5)
 
         IO.setup(self.ENA, IO.OUT)
@@ -66,41 +74,44 @@ class cameraMount:
         blue = IO.input(self.BLUE1)
         # Update motor position
         if blue:
-            self.degrees += 1
+            self.degrees1 += 1
         else:
-            self.degrees -= 1
+            self.degrees1 -= 1
         # Get PID output and set motor speed accordingly
-        motor1Speed = self.motor1pid(self.degrees) 
+        motorSpeed = self.motor1pid(self.degrees1) 
+        magnitude_of_speed = abs(motorSpeed)
 
-        self.setMotor1Speed(abs(motor1Speed))
-        self.setMotor2Speed(abs(motor1Speed))
-        if motor1Speed <= 0:
+        # Set speed
+        self.setMotor1Speed(magnitude_of_speed)
+
+        # Set direction
+        if motorSpeed <= 0:
             self.setMotor1Direction("up")
-            self.setMotor2Direction("up")
-        elif motor1Speed > 0:
+        elif motorSpeed > 0:
             self.setMotor1Direction("down")
-            self.setMotor2Direction("down")
- 
  
 
 
         
     def motor2Callback(self, channel):
-        #Read motor encoder inputs
+        # Read motor encoder inputs
         blue = IO.input(self.BLUE2)
         # Update motor position
         if blue:
             self.degrees2 += 1
         else:
             self.degrees2 -= 1
-            
         # Get PID output and set motor speed accordingly
-        motor2Speed = self.motor2pid(self.degrees2)
-        self.setMotor2Speed(abs(motor2Speed))
-        print(motor2Speed)
-        if motor2Speed <= 0:
+        motorSpeed = self.motor2pid(self.degrees2) 
+        magnitude_of_speed = abs(motorSpeed)
+
+        # Set speed
+        self.setMotor2Speed(magnitude_of_speed)
+
+        # Set direction
+        if motorSpeed <= 0:
             self.setMotor2Direction("up")
-        elif motor2Speed > 0:
+        elif motorSpeed > 0:
             self.setMotor2Direction("down")
 
 
@@ -108,8 +119,8 @@ class cameraMount:
     # Set the camera height target in the PID controller 
     def setCameraHeight(self, targetPos):
         if self.minPos <= targetPos <= self.maxPos:
-            self.targetPos = targetPos
             self.motor1pid.setpoint = targetPos
+            self.motor2pid.setpoint = targetPos
             self.setMotor1Direction("up")
             self.setMotor2Direction("up")
             self.setMotor1Speed(self.motorSpeed)
@@ -121,15 +132,12 @@ class cameraMount:
     Utility Functions for setting motor direction
     '''
     def setMotor1Speed(self, speed):
-        # print("Motor speed called")
         self.motor1.ChangeDutyCycle(speed)
 
     def setMotor2Speed(self, speed):
-        # print("Motor speed called")
         self.motor2.ChangeDutyCycle(speed)
 
     def setMotor1Direction(self, direction):
-        # print("Direction Changed")
         if direction == "up":
             IO.output(self.M1_1, IO.HIGH)
             IO.output(self.M1_2, IO.LOW)
@@ -140,23 +148,11 @@ class cameraMount:
             print("Invalid Direction Input")
 
     def setMotor2Direction(self, direction):
-        # print("Direction Changed")
         if direction == "up":
-            IO.output(self.M2_1, IO.LOW)
-            IO.output(self.M2_2, IO.HIGH)
-        elif direction == "down":
             IO.output(self.M2_1, IO.HIGH)
             IO.output(self.M2_2, IO.LOW)
+        elif direction == "down":
+            IO.output(self.M2_1, IO.LOW)
+            IO.output(self.M2_2, IO.HIGH)
         else:
             print("Invalid Direction Input")
-
-if __name__ == '__main__':
-    try:
-        c = cameraMount(178)
-        c.setCameraHeight()
-        time.sleep(20)
-        c.motor1.stop()
-        c.motor2.stop()
-    except KeyboardInterrupt:
-        c.motor1.stop()
-        c.motor2.stop()
