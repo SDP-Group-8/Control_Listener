@@ -1,10 +1,14 @@
-from motors import cameraMount
+from motors_asymetric import cameraMount
 import time
 
 def main():
     global c
     c = cameraMount()
-    c.setCameraHeight(85)
+    c.setCameraHeight(150)
+    time.sleep(2)
+    c.setCameraHeight(90)
+    # c.motor1.stop()
+    # c.motor2.stop()
 
     while True:
         print("position", c.degrees)
