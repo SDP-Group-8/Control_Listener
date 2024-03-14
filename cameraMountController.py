@@ -127,7 +127,7 @@ class cameraMount:
     def motorController(self):
         print("Motor Controller Turned On")
         # While motors not in the correct position and the stop motors flag is not set
-        while self.motorsOn.is_set() and abs(self.degrees1 - self.targetPos) < self.tolerance and abs(self.degrees2 - self.targetPos) < self.tolerance:
+        while self.motorsOn.is_set():
                 print("Control Loop Running")
                 '''
                 Motor 1 Control
