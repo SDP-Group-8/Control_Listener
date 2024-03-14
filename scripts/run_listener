@@ -1,0 +1,7 @@
+#! /usr/bin/env python
+
+from src.control_listener.cameraMountController import cameraMountController
+
+if __name__ == '__main__':
+    node = cameraMountController()
+    node.init()
