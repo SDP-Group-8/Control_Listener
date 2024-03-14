@@ -96,6 +96,7 @@ class cameraMount:
     Motor Controller Functions
     '''
     def turnOn(self):
+        print("Turning on")
         try:
             self.motorsOn.set()
             control_thread = threading.Thread(target=self.motorController)
@@ -106,6 +107,7 @@ class cameraMount:
             return False
     
     def turnOff(self):
+        print("Turning off")
         try:
             self.motorsOn.clear()
             return True
@@ -123,8 +125,10 @@ class cameraMount:
             print("Invalid Position Input")
 
     def motorController(self):
+        print("Motor Controller Turned On")
         # While motors not in the correct position and the stop motors flag is not set
         while self.motorsOn.is_set() and abs(self.degrees1 - self.targetPos) < self.tolerance and abs(self.degrees2 - self.targetPos) < self.tolerance:
+                print("Control Loop Running")
                 '''
                 Motor 1 Control
                 '''
