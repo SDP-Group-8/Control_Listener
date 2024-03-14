@@ -29,7 +29,7 @@ class cameraMountController:
         self.independentControl = False # default value: False
 
         self.targetPos = 0 # initial target position
-        self.tolerance = 0
+        self.tolerance = 4
         '''
         GPIO Setup
         '''
@@ -63,7 +63,7 @@ class cameraMountController:
         self.degrees1 = 0
         self.degrees2 = 0
 
-        self.motor1pid = PID(3, 1, 0.1)
+        self.motor1pid = PID(4, 2, 0.1)
         self.motor2pid = PID(0, 0, 0)
 
         # PID bounds set so controller can half the speed of the motor.
