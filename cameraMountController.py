@@ -3,7 +3,7 @@ import time
 import RPi.GPIO as IO
 from simple_pid import PID 
 
-class cameraMount:
+class cameraMountController:
     def __init__(self):
         '''
         GPIO Pin Numbers Config
@@ -26,9 +26,10 @@ class cameraMount:
         self.minPos = 0
         self.maxPos = 200
 
-        self.targetPos = 0 # initial target position
-        self.tolerance = 2
+        self.independentControl = False # default value: False
 
+        self.targetPos = 0 # initial target position
+        self.tolerance = 0
         '''
         GPIO Setup
         '''
@@ -62,12 +63,12 @@ class cameraMount:
         self.degrees1 = 0
         self.degrees2 = 0
 
-        self.motor1pid = PID(10, 4, 0)
+        self.motor1pid = PID(3, 1, 0.1)
         self.motor2pid = PID(0, 0, 0)
 
         # PID bounds set so controller can half the speed of the motor.
-        self.motor1pid.output_limits = (-100, 100)
-        self.motor2pid.output_limits = (-100, 100)
+        self.motor1pid.output_limits = (-70, 100)
+        self.motor2pid.output_limits = (-70, 100)
 
         self.motorsOn = threading.Event()
 
@@ -99,6 +100,8 @@ class cameraMount:
         print("Turning on")
         try:
             self.motorsOn.set()
+            self.motor1.start(0)
+            self.motor2.start(0)
             control_thread = threading.Thread(target=self.motorController)
             control_thread.start()
             return True
@@ -110,6 +113,8 @@ class cameraMount:
         print("Turning off")
         try:
             self.motorsOn.clear()
+            self.motor1.stop()
+            self.motor2.stop()
             return True
         except:
             print("Error: Unable to stop motor controller")
@@ -118,6 +123,7 @@ class cameraMount:
     # Set the camera height target in the PID controller 
     def setCameraHeight(self, targetPos):
         if self.minPos <= targetPos <= self.maxPos:
+            print("Updating Camera Height", targetPos)
             self.targetPos = targetPos
             self.motor1pid.setpoint = targetPos
             self.motor2pid.setpoint = targetPos
@@ -125,42 +131,78 @@ class cameraMount:
             print("Invalid Position Input")
 
     def motorController(self):
-        print("Motor Controller Turned On")
         # While motors not in the correct position and the stop motors flag is not set
         while self.motorsOn.is_set():
-                print("Control Loop Running")
-                '''
-                Motor 1 Control
-                '''
-                # Get Value from PID
-                motor1Speed = self.motor1pid(self.degrees1)
+                if self.independentControl:
+                    self.moveMotorsIndependently()
+                else:
+                    self.moveMotorsConnected()
+                time.sleep(0.2)
 
-                # Set speed
-                self.motor1.ChangeDutyCycle(abs(motor1Speed))
-                # Set direction
-                if motor1Speed <= 0:
-                    IO.output(self.M1_1, IO.HIGH)
-                    IO.output(self.M1_2, IO.LOW)
-                elif motor1Speed > 0:
-                    IO.output(self.M1_1, IO.LOW)
-                    IO.output(self.M1_2, IO.HIGH)
-                
-                '''
-                Motor 2 Control
-                '''
-                # Initial Run of PID
-                motor2Speed = self.motor2pid(self.degrees2) 
-                # Set speed
-                self.motor2.ChangeDutyCycle(abs(motor2Speed))
-                # Set direction
-                if motor2Speed <= 0:
-                    IO.output(self.M2_1, IO.LOW)
-                    IO.output(self.M2_2, IO.HIGH)
-                elif motor2Speed > 0:
-                    IO.output(self.M2_1, IO.HIGH)
-                    IO.output(self.M2_2, IO.LOW)
+    def moveMotorsIndependently(self):
+        '''
+        Motor 1
+        '''
+        if abs(self.degrees1 - self.targetPos) < self.tolerance:
+            print("Within Tolerance")
+            self.motor1.ChangeDutyCycle(0)
+        else:
+            # Calculate what speed should be
+            motor1Speed = self.motor1pid(self.degrees1)
+            # Set Speed
+            self.motor1.ChangeDutyCycle(abs(motor1Speed))
+            # Set direction
+            if motor1Speed <= 0:
+                IO.output(self.M1_1, IO.HIGH)
+                IO.output(self.M1_2, IO.LOW)
+            elif motor1Speed > 0:
+                IO.output(self.M1_1, IO.LOW)
+                IO.output(self.M1_2, IO.HIGH)
 
-                '''
-                Control Loop Speed
-                '''
-                time.sleep(0.1)
+        '''
+        Motor 2
+        '''
+        if abs(self.degrees2 - self.targetPos) < self.tolerance:
+            self.motor2.ChangeDutyCycle(0)
+        else:
+            # Calculate what speed should be
+            motor2Speed = self.motor2pid(self.degrees2) 
+            # Set speed
+            self.motor2.ChangeDutyCycle(abs(motor2Speed))
+            # Set direction
+            if motor2Speed <= 0:
+                IO.output(self.M2_1, IO.LOW)
+                IO.output(self.M2_2, IO.HIGH)
+            elif motor2Speed > 0:
+                IO.output(self.M2_1, IO.HIGH)
+                IO.output(self.M2_2, IO.LOW)
+
+
+    '''
+    Uses one PID controller and treats both motors as 1
+    '''
+    def moveMotorsConnected(self):
+        if abs(self.degrees1 - self.targetPos) < self.tolerance:
+            print("Within Tolerance", abs(self.degrees1 - self.targetPos))
+            self.motor1.ChangeDutyCycle(0)
+            self.motor2.ChangeDutyCycle(0)
+        else:
+            # Get Value from PID
+            motorSpeed = self.motor1pid(self.degrees1)
+            print("Motor Speed:", motorSpeed, "Distance:", (self.degrees1 - self.targetPos))
+            # print("Position:", self.degrees1)
+
+            # Set speed
+            self.motor1.ChangeDutyCycle(abs(motorSpeed))
+            self.motor2.ChangeDutyCycle(abs(motorSpeed))
+            # Set direction
+            if motorSpeed <= 0:
+                IO.output(self.M1_1, IO.HIGH)
+                IO.output(self.M1_2, IO.LOW)
+                IO.output(self.M2_1, IO.LOW)
+                IO.output(self.M2_2, IO.HIGH)
+            elif motorSpeed > 0:
+                IO.output(self.M1_1, IO.LOW)
+                IO.output(self.M1_2, IO.HIGH)
+                IO.output(self.M2_1, IO.HIGH)
+                IO.output(self.M2_2, IO.LOW)
