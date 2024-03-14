@@ -108,6 +108,8 @@ class cameraMountController:
     def setDistanceCallback(self, Float32):
         self.setCameraHeight(Float32.data)
 
+    # TODO ~ Add ROS Subscriber for turning on/off motors?
+
     '''
     Motor Controller Functions
     '''
