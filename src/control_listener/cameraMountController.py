@@ -3,6 +3,9 @@ import time
 import RPi.GPIO as IO
 from simple_pid import PID 
 
+import rospy
+from std_msgs.msg import Float32
+
 class cameraMountController:
     def __init__(self):
         '''
@@ -92,6 +95,18 @@ class cameraMountController:
             self.degrees2 += 1
         else:
             self.degrees2 -= 1
+    '''
+    ROS Interface Functions
+    '''
+    def init(self):
+        rospy.Subscriber("/cmd_vel", Float32, self.setDistanceCallback)
+        rospy.init_node("control_listener_node", anonymous=True)
+        rospy.spin()
+        self.turnOn()
+        self.setCameraHeight(0)
+
+    def setDistanceCallback(self, Float32):
+        self.setCameraHeight(Float32.data)
 
     '''
     Motor Controller Functions
