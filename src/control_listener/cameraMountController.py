@@ -65,7 +65,7 @@ class cameraMountController:
         IO.setup(self.YELLOW2, IO.IN, pull_up_down=IO.PUD_DOWN)
         IO.setup(self.BLUE2, IO.IN, pull_up_down=IO.PUD_DOWN)
 
-        IO.add_event_detect(self.YELLOW1, IO.RISING, callback=self.newM1Callback, bouncetime=5)
+        IO.add_event_detect(self.YELLOW1, IO.RISING, callback=self.motor1Callback, bouncetime=2)
         # IO.add_event_detect(self.YELLOW2, IO.RISING, callback=self.motor2Callback)
 
         IO.setup(self.ENA, IO.OUT)
@@ -82,50 +82,27 @@ class cameraMountController:
     '''
     Encoder Callbacks to Detect Motor Position
     '''
-    def motor1Callback(self, channel):
-        rospy.loginfo("M1 Pos:" + str(self.degrees1))
-        # Read motor encoder inputs
-        time.sleep(0.002)
-
-        yellow = IO.input(self.YELLOW1)
-        blue = IO.input(self.BLUE1)
-        
-        # Update motor position
-        if yellow == 1 and blue == 0:
-            rospy.loginfo("FORWARD")
-            self.degrees1 += 1
-            while blue == 0:
-                blue = IO.input(self.BLUE1)
-            while blue == 1:
-                blue = IO.input(self.BLUE1)
-            return
-        elif yellow == 1 and blue == 1:
-            rospy.loginfo("BACKWARD")
-            self.degrees1 -= 1
-            while blue == 1:
-                blue = IO.input(self.BLUE1)
-            return
-        else:
-            return
     
-    def newM1Callback(self, channel):
+    def motor1Callback(self, channel):
         # yellow = IO.input(self.YELLOW1)  # stores the value of the encoders at time of interrupt
         # blue = IO.input(self.YELLOW2)
+        # Yellow1 Pin = 21
+        # Blue1 Pin = 20
         if (IO.input(21) == IO.input(20)):
         # this will be clockwise rotation
             self.degrees1 += 1
         else:
             self.degrees1 -= 1
             
-    def motor2Callback(self, channel):
-        with self.degreesLock:
-            # Read motor encoder inputs
-            blue = IO.input(self.BLUE2)
-            # Update motor position
-            if blue:
-                self.degrees2 += 1
-            else:
-                self.degrees2 -= 1
+    # def motor2Callback(self, channel):
+    #     with self.degreesLock:
+    #         # Read motor encoder inputs
+    #         blue = IO.input(self.BLUE2)
+    #         # Update motor position
+    #         if blue:
+    #             self.degrees2 += 1
+    #         else:
+    #             self.degrees2 -= 1
     '''
     ROS Interface Functions
     '''
