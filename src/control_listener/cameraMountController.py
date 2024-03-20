@@ -62,7 +62,7 @@ class cameraMountController:
         IO.setup(self.YELLOW2, IO.IN, pull_up_down=IO.PUD_DOWN)
         IO.setup(self.BLUE2, IO.IN, pull_up_down=IO.PUD_DOWN)
 
-        IO.add_event_detect(self.YELLOW1, IO.RISING, callback=self.motor1Callback, bouncetime=3)
+        IO.add_event_detect(self.YELLOW1, IO.RISING, callback=self.motor1Callback, bouncetime=2)
         IO.add_event_detect(self.YELLOW2, IO.RISING, callback=self.motor2Callback)
 
         IO.setup(self.ENA, IO.OUT)
@@ -80,25 +80,28 @@ class cameraMountController:
     Encoder Callbacks to Detect Motor Position
     '''
     def motor1Callback(self, channel):
-        with self.degreesLock:
-            rospy.loginfo("M1 Pos:" + str(self.degrees1))
-            # Read motor encoder inputs
-            time.sleep(0.002)
-            blue = IO.input(self.BLUE1)
-            yellow = IO.input(self.YELLOW1)
-            # Update motor position
-            if yellow == 1 and blue == 0:
-                self.degrees1 += 1
-                while blue == 0:
-                    blue = IO.input(self.BLUE1)
-                while blue == 1:
-                    blue = IO.input(self.BLUE1)
-                return
-            elif yellow == 1 and blue == 1:
-               self.degrees1 -= 1
-               while blue == 1:
-                   blue = IO.input(self.BLUE1)
-               return
+        rospy.loginfo("M1 Pos:" + str(self.degrees1))
+        # Read motor encoder inputs
+        time.sleep(0.002)
+
+        yellow = IO.input(self.YELLOW1)
+        blue = IO.input(self.BLUE1)
+        
+        # Update motor position
+        if yellow == 1 and blue == 0:
+            self.degrees1 += 1
+            while blue == 0:
+                blue = IO.input(self.BLUE1)
+            while blue == 1:
+                blue = IO.input(self.BLUE1)
+            return
+        elif yellow == 1 and blue == 1:
+            self.degrees1 -= 1
+            while blue == 1:
+                blue = IO.input(self.BLUE1)
+            return
+        else:
+            return
             
     def motor2Callback(self, channel):
         with self.degreesLock:
