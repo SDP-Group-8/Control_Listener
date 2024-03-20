@@ -40,7 +40,8 @@ class cameraMountController:
         self.degrees1 = 0
         self.degrees2 = 0
 
-        self.motor1pid = PID(4, 2, 0.2)
+        # self.motor1pid = PID(4, 2, 0.1)
+        self.motor1pid = None
         self.motor2pid = PID(0, 0, 0)
 
         # PID bounds set so controller can half the speed of the motor.
@@ -97,10 +98,11 @@ class cameraMountController:
     '''
     ROS Interface Functions
     '''
-    def init(self, cameraHeight):
+    def init(self, cameraHeight, p, i, d):
         rospy.Subscriber("/height", Float32, self.setDistanceCallback)
         rospy.init_node("control_listener_node", anonymous=True)
         rospy.on_shutdown(self.turnOff)
+        self.motor1pid = PID(p, i, d)
         self.turnOn()
         self.setCameraHeight(cameraHeight)
         rospy.spin()
