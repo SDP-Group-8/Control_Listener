@@ -114,7 +114,7 @@ class cameraMountController:
         if (yellow == 1 and blue == 0):
         # this will be clockwise rotation
             self.degrees1 += 1
-        elif (yellow == 1 and self.blue == 0) :
+        elif (yellow == 1 and self.blue == 1):
         # this will be counter-clockwise rotation
             self.degrees1 -= 1
             
