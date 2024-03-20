@@ -204,14 +204,14 @@ class cameraMountController:
     Uses one PID controller and treats both motors as 1
     '''
     def moveMotorsConnected(self):
-        rospy.loginfo("Moving Motors")
-
         if abs(self.degrees1 - self.targetPos) < self.tolerance:
+            rospy.loginfo("Motors: AT Position")
             self.motor1.ChangeDutyCycle(0)
             self.motor2.ChangeDutyCycle(0)
         else:
             # Get Value from PID
             motorSpeed = self.motor1pid(self.degrees1)
+            rospy.loginfo("Motors: Moving, Speed: " + str(motorSpeed) + " Distance: " + str(self.degrees1 - self.targetPos)) 
             # print("Motor Speed:", motorSpeed, "Distance:", (self.degrees1 - self.targetPos))
             # print("Position:", self.degrees1)
 
