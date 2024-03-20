@@ -136,8 +136,8 @@ class cameraMountController:
                 self.motorsOn.clear()
             self.motor1.stop()
             self.motor2.stop()
-            IO.cleanup()
             self.control_thread.join()
+            IO.cleanup()
             rospy.loginfo("Turned OFF successfully")
         except Exception as e:
             rospy.loginfo("Error: Unable to stop motor controller" + str(e))
