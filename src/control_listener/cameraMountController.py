@@ -32,7 +32,7 @@ class cameraMountController:
         self.independentControl = False # default value: False
 
         self.targetPos = 0 # initial target position
-        self.tolerance = 4
+        self.tolerance = 5
 
         '''
         Motor Controller Setup
@@ -170,12 +170,9 @@ class cameraMountController:
     def motorController(self):
         # While motors not in the correct position and the stop motors flag is not set
         while self.motorsOn.is_set() and not rospy.is_shutdown():
-                rospy.loginfo("1:" + str(self.degrees1) + " 2:" + str(self.degrees2))
-                # if self.independentControl:
-                #     self.moveMotorsIndependently()
-                # else:
-                #     self.moveMotorsConnected()
-                time.sleep(0.2)
+                # rospy.loginfo("1:" + str(self.degrees1) + " 2:" + str(self.degrees2))
+                self.moveMotorsConnected()
+                time.sleep(0.005)
 
     def moveMotorsIndependently(self):
         '''
