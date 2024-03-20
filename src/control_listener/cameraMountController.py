@@ -109,9 +109,9 @@ class cameraMountController:
             return
     
     def newM1Callback(self, channel):
-        yellow = IO.input(self.YELLOW1)  # stores the value of the encoders at time of interrupt
-        blue = IO.input(self.YELLOW2)
-        if (yellow == blue):
+        # yellow = IO.input(self.YELLOW1)  # stores the value of the encoders at time of interrupt
+        # blue = IO.input(self.YELLOW2)
+        if (IO.input(21) == IO.input(20)):
         # this will be clockwise rotation
             self.degrees1 += 1
         else:
