@@ -5,6 +5,6 @@ from control_listener.cameraMountController import cameraMountController
 if __name__ == '__main__':
     try:
         node = cameraMountController()
-        node.init()
+        node.init(50)
     except KeyboardInterrupt:
         node.turnOff()

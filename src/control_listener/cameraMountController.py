@@ -97,11 +97,12 @@ class cameraMountController:
     '''
     ROS Interface Functions
     '''
-    def init(self):
+    def init(self, cameraHeight):
         rospy.Subscriber("/height", Float32, self.setDistanceCallback)
         rospy.init_node("control_listener_node", anonymous=True)
         rospy.on_shutdown(self.turnOff)
         self.turnOn()
+        self.setCameraHeight(cameraHeight)
         rospy.spin()
         self.turnOff()
 
@@ -119,7 +120,7 @@ class cameraMountController:
             self.motorsOn.set()
             self.motor1.start(0)
             self.motor2.start(0)
-            self.setCameraHeight(0)
+            # self.setCameraHeight(0)
             self.control_thread.start()
             rospy.loginfo("Turned On Successfully")
         except Exception as e:
