@@ -145,7 +145,7 @@ class cameraMountController:
     # Set the camera height target in the PID controller 
     def setCameraHeight(self, targetPos):
         if self.minPos <= targetPos <= self.maxPos:
-            rospy.loginfo("Updating Camera Height:", targetPos)
+            rospy.loginfo("Updating Camera Height:" + str(targetPos))
             self.targetPos = targetPos
             self.motor1pid.setpoint = targetPos
             self.motor2pid.setpoint = targetPos
