@@ -103,7 +103,6 @@ class cameraMountController:
         rospy.on_shutdown(self.turnOff)
         self.motor1pid = PID(p, i, d)
         self.motor1pid.output_limits = (-70, 100)
-        self.motor2pid.output_limits = (-70, 100)
         self.turnOn()
         self.setCameraHeight(cameraHeight)
         rospy.spin()
