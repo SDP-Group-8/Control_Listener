@@ -109,6 +109,7 @@ class cameraMountController:
             return
     
     def newM1Callback(self, channel):
+        rospy.loginfo("M1 Pos:" + str(self.degrees1))
         yellow = IO.input(self.YELLOW1)  # stores the value of the encoders at time of interrupt
         blue = IO.input(self.YELLOW2)
         if (yellow == 1 and self.d1Bold == 0) or (yellow == 0 and self.d1Bold == 1):
