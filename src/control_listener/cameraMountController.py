@@ -88,6 +88,7 @@ class cameraMountController:
                 self.degrees1 += 1
             else:
                 self.degrees1 -= 1
+            rospy.loginfo("Motor 1: " + str(self.degrees1))
 
     def motor2Callback(self, channel):
         with self.degreesLock:
@@ -165,12 +166,12 @@ class cameraMountController:
     def motorController(self):
         # While motors not in the correct position and the stop motors flag is not set
         while self.motorsOn.is_set() and not rospy.is_shutdown():
-                rospy.loginfo("1:" + str(self.degrees1) + " 2:" + str(self.degrees2))
+                # rospy.loginfo("1:" + str(self.degrees1) + " 2:" + str(self.degrees2))
                 # if self.independentControl:
                 #     self.moveMotorsIndependently()
                 # else:
                 #     self.moveMotorsConnected()
-                time.sleep(1)
+                time.sleep(2)
 
     def moveMotorsIndependently(self):
         '''
