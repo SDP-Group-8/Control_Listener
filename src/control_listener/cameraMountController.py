@@ -62,7 +62,7 @@ class cameraMountController:
         IO.setup(self.YELLOW2, IO.IN, pull_up_down=IO.PUD_DOWN)
         IO.setup(self.BLUE2, IO.IN, pull_up_down=IO.PUD_DOWN)
 
-        IO.add_event_detect(self.YELLOW1, IO.RISING, callback=self.motor1Callback, bouncetime=4)
+        IO.add_event_detect(self.YELLOW1, IO.RISING, callback=self.motor1Callback, bouncetime=5)
         # IO.add_event_detect(self.YELLOW2, IO.RISING, callback=self.motor2Callback)
 
         IO.setup(self.ENA, IO.OUT)
@@ -82,7 +82,7 @@ class cameraMountController:
     def motor1Callback(self, channel):
         rospy.loginfo("M1 Pos:" + str(self.degrees1))
         # Read motor encoder inputs
-        time.sleep(0.002)
+        time.sleep(0.003)
 
         yellow = IO.input(self.YELLOW1)
         blue = IO.input(self.BLUE1)
