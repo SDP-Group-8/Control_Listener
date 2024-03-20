@@ -42,6 +42,9 @@ class cameraMountController:
             self.degrees1 = 0
             self.degrees2 = 0
 
+        self.d1Bold = 0
+        self.d1Yold = 0
+
         # self.motor1pid = PID(4, 2, 0.1)
         # self.motor1pid = None
         # self.motor2pid = PID(0, 0, 0)
@@ -62,7 +65,7 @@ class cameraMountController:
         IO.setup(self.YELLOW2, IO.IN, pull_up_down=IO.PUD_DOWN)
         IO.setup(self.BLUE2, IO.IN, pull_up_down=IO.PUD_DOWN)
 
-        IO.add_event_detect(self.YELLOW1, IO.RISING, callback=self.motor1Callback, bouncetime=20)
+        IO.add_event_detect(self.YELLOW1, IO.BOTH, callback=self.newM1Callback, bouncetime=3)
         # IO.add_event_detect(self.YELLOW2, IO.RISING, callback=self.motor2Callback)
 
         IO.setup(self.ENA, IO.OUT)
@@ -104,6 +107,19 @@ class cameraMountController:
             return
         else:
             return
+    
+    def newM1Callback(self, channel):
+        yellow = IO.input(self.YELLOW1)  # stores the value of the encoders at time of interrupt
+        blue = IO.input(self.YELLOW2)
+        if (yellow == 1 and self.d1Bold == 0) or (yellow == 0 and self.d1Bold == 1):
+        # this will be clockwise rotation
+            self.degrees1 += 1
+        elif (yellow == 1 and self.d1Bold == 1) or (yellow == 0 and self.d1Bold == 0):
+        # this will be counter-clockwise rotation
+            self.degrees1 -= 1
+        
+        self.d1Yold = yellow
+        self.d1Bold = blue
             
     def motor2Callback(self, channel):
         with self.degreesLock:
