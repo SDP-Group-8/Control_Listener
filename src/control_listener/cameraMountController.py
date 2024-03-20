@@ -27,7 +27,7 @@ class cameraMountController:
         Config Variables
         '''
         self.minPos = 0
-        self.maxPos = 200
+        self.maxPos = 500
 
         self.independentControl = False # default value: False
 
@@ -66,7 +66,7 @@ class cameraMountController:
         self.degrees1 = 0
         self.degrees2 = 0
 
-        self.motor1pid = PID(4, 2, 0.1)
+        self.motor1pid = PID(4, 2, 0.2)
         self.motor2pid = PID(0, 0, 0)
 
         # PID bounds set so controller can half the speed of the motor.
