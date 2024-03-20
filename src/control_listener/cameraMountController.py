@@ -33,32 +33,6 @@ class cameraMountController:
 
         self.targetPos = 0 # initial target position
         self.tolerance = 4
-        '''
-        GPIO Setup
-        '''
-        IO.setwarnings(False)
-        IO.setmode(IO.BCM)
-
-        IO.setup(self.YELLOW1, IO.IN, pull_up_down=IO.PUD_DOWN)
-        IO.setup(self.BLUE1, IO.IN, pull_up_down=IO.PUD_DOWN)
-        IO.setup(self.YELLOW2, IO.IN, pull_up_down=IO.PUD_DOWN)
-        IO.setup(self.BLUE2, IO.IN, pull_up_down=IO.PUD_DOWN)
-
-        IO.add_event_detect(self.YELLOW1, IO.RISING, callback=self.motor1Callback)
-        IO.add_event_detect(self.YELLOW2, IO.RISING, callback=self.motor2Callback)
-
-        IO.setup(self.ENA, IO.OUT)
-        IO.setup(self.ENB, IO.OUT)
-        IO.setup(self.M1_1, IO.OUT)
-        IO.setup(self.M1_2, IO.OUT)
-        IO.setup(self.M2_1, IO.OUT)
-        IO.setup(self.M2_2, IO.OUT)
-
-        '''
-        Create Motors
-        '''
-        self.motor1 = IO.PWM(self.ENA, 500)
-        self.motor2 = IO.PWM(self.ENB, 500)
 
         '''
         Motor Controller Setup
@@ -73,7 +47,32 @@ class cameraMountController:
         self.motor1pid.output_limits = (-70, 100)
         self.motor2pid.output_limits = (-70, 100)
 
+        # Setup Control Thread
         self.motorsOn = threading.Event()
+        self.control_thread = threading.Thread(target=self.motorController)
+
+    def setupGPIO(self):
+        IO.setwarnings(False)
+        IO.setmode(IO.BCM)
+
+        IO.setup(self.YELLOW1, IO.IN, pull_up_down=IO.PUD_DOWN)
+        IO.setup(self.BLUE1, IO.IN, pull_up_down=IO.PUD_DOWN)
+        IO.setup(self.YELLOW2, IO.IN, pull_up_down=IO.PUD_DOWN)
+        IO.setup(self.BLUE2, IO.IN, pull_up_down=IO.PUD_DOWN)
+
+        IO.add_event_detect(self.YELLOW1, IO.RISING, callback=self.motor1Callback, bouncetime = 50)
+        IO.add_event_detect(self.YELLOW2, IO.RISING, callback=self.motor2Callback, bouncetime = 50)
+
+        IO.setup(self.ENA, IO.OUT)
+        IO.setup(self.ENB, IO.OUT)
+        IO.setup(self.M1_1, IO.OUT)
+        IO.setup(self.M1_2, IO.OUT)
+        IO.setup(self.M2_1, IO.OUT)
+        IO.setup(self.M2_2, IO.OUT)
+
+        # Create Motors
+        self.motor1 = IO.PWM(self.ENA, 100)
+        self.motor2 = IO.PWM(self.ENB, 100)
 
     '''
     Encoder Callbacks to Detect Motor Position
@@ -101,16 +100,14 @@ class cameraMountController:
     def init(self):
         rospy.Subscriber("/height", Float32, self.setDistanceCallback)
         rospy.init_node("control_listener_node", anonymous=True)
-        rospy.spin()
+        rospy.on_shutdown(self.turnOff)
         self.turnOn()
-        rospy.loginfo("starting")
-        self.setCameraHeight(0)
+        rospy.spin()
+        self.turnOff()
 
-    def setDistanceCallback(self, Float32):
+    def setDistanceCallback(self, height):
         rospy.loginfo("callingt callback!")
-        self.setCameraHeight(Float32.data)
-
-    # TODO ~ Add ROS Subscriber for turning on/off motors?
+        self.setCameraHeight(height.data)
 
     '''
     Motor Controller Functions
@@ -118,31 +115,33 @@ class cameraMountController:
     def turnOn(self):
         rospy.loginfo("Turning on...")
         try:
+            self.setupGPIO()
             self.motorsOn.set()
             self.motor1.start(0)
             self.motor2.start(0)
-            control_thread = threading.Thread(target=self.motorController, daemon=True)
-            control_thread.start()
+            self.setCameraHeight(0)
+            self.control_thread.start()
             rospy.loginfo("Turned On Successfully")
-            return True
         except Exception as e:
             rospy.loginfo("Error: Unable to start motor controller")
             rospy.loginfo(e)
-            print("Error: Unable to start motor controller")
-            return False
     
     def turnOff(self):
         print("Turning off")
         rospy.loginfo("Turning OFF motor controller")
         try:
-            self.motorsOn.clear()
+            try:
+                with threading.Lock:
+                    self.motorsOn.clear()
+            except:
+                self,motorsOn.clear()
             self.motor1.stop()
             self.motor2.stop()
+            IO.cleanup()
+            self.control_thread.join()
             rospy.loginfo("Turned OFF successfully")
-            return True
         except:
             rospy.loginfo("Error: Unable to stop motor controller")
-            return False
 
     # Set the camera height target in the PID controller 
     def setCameraHeight(self, targetPos):
@@ -159,7 +158,7 @@ class cameraMountController:
 
     def motorController(self):
         # While motors not in the correct position and the stop motors flag is not set
-        while self.motorsOn.is_set():
+        while self.motorsOn.is_set() and not rospy.is_shutdown():
                 if self.independentControl:
                     self.moveMotorsIndependently()
                 else:
