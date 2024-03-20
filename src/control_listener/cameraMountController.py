@@ -105,8 +105,11 @@ class cameraMountController:
         rospy.Subscriber("/height", Float32, self.setDistanceCallback)
         rospy.init_node("control_listener_node", anonymous=True)
         rospy.on_shutdown(self.turnOff)
+        # TODO move this??
         self.motor1pid = PID(p, i, d)
+        self.motor2pid = PID(p, i, d)
         self.motor1pid.output_limits = (-70, 100)
+        self.motor2pid.output_limits = (-70, 100)
         self.turnOn()
         self.setCameraHeight(cameraHeight)
         rospy.spin()
@@ -196,10 +199,9 @@ class cameraMountController:
         if abs(self.degrees2 - self.targetPos) < self.tolerance:
             self.motor2.ChangeDutyCycle(0)
         else:
-            motor2Speed = 0
             # Calculate what speed should be
-            # with self.degreesLock:
-                # motor2Speed = self.motor2pid(self.degrees2) 
+            with self.degreesLock:
+                motor2Speed = self.motor2pid(self.degrees2) 
             # Set speed
             self.motor2.ChangeDutyCycle(abs(motor2Speed))
             # Set direction
