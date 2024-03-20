@@ -37,8 +37,10 @@ class cameraMountController:
         '''
         Motor Controller Setup
         '''
-        self.degrees1 = 0
-        self.degrees2 = 0
+        self.degreesLock = threading.Lock()
+        with self.degreesLock:
+            self.degrees1 = 0
+            self.degrees2 = 0
 
         # self.motor1pid = PID(4, 2, 0.1)
         # self.motor1pid = None
@@ -60,8 +62,8 @@ class cameraMountController:
         IO.setup(self.YELLOW2, IO.IN, pull_up_down=IO.PUD_DOWN)
         IO.setup(self.BLUE2, IO.IN, pull_up_down=IO.PUD_DOWN)
 
-        IO.add_event_detect(self.YELLOW1, IO.RISING, callback=self.motor1Callback)
-        IO.add_event_detect(self.YELLOW2, IO.RISING, callback=self.motor2Callback)
+        IO.add_event_detect(self.YELLOW1, IO.RISING, callback=self.motor1Callback, bouncetime=3)
+        IO.add_event_detect(self.YELLOW2, IO.RISING, callback=self.motor2Callback, bouncetime=3)
 
         IO.setup(self.ENA, IO.OUT)
         IO.setup(self.ENB, IO.OUT)
@@ -78,22 +80,24 @@ class cameraMountController:
     Encoder Callbacks to Detect Motor Position
     '''
     def motor1Callback(self, channel):
-        # Read motor encoder inputs
-        blue = IO.input(self.BLUE1)
-        # Update motor position
-        if blue:
-            self.degrees1 += 1
-        else:
-            self.degrees1 -= 1
+        with self.degreesLock:
+            # Read motor encoder inputs
+            blue = IO.input(self.BLUE1)
+            # Update motor position
+            if blue:
+                self.degrees1 += 1
+            else:
+                self.degrees1 -= 1
 
     def motor2Callback(self, channel):
-        # Read motor encoder inputs
-        blue = IO.input(self.BLUE2)
-        # Update motor position
-        if blue:
-            self.degrees2 += 1
-        else:
-            self.degrees2 -= 1
+        with self.degreesLock:
+            # Read motor encoder inputs
+            blue = IO.input(self.BLUE2)
+            # Update motor position
+            if blue:
+                self.degrees2 += 1
+            else:
+                self.degrees2 -= 1
     '''
     ROS Interface Functions
     '''
@@ -158,11 +162,12 @@ class cameraMountController:
     def motorController(self):
         # While motors not in the correct position and the stop motors flag is not set
         while self.motorsOn.is_set() and not rospy.is_shutdown():
-                if self.independentControl:
-                    self.moveMotorsIndependently()
-                else:
-                    self.moveMotorsConnected()
-                time.sleep(0.2)
+                rospy.loginfo("1:" + str(self.degrees1) + " 2:" + str(self.degrees2))
+                # if self.independentControl:
+                #     self.moveMotorsIndependently()
+                # else:
+                #     self.moveMotorsConnected()
+                time.sleep(1)
 
     def moveMotorsIndependently(self):
         '''
@@ -173,7 +178,8 @@ class cameraMountController:
             self.motor1.ChangeDutyCycle(0)
         else:
             # Calculate what speed should be
-            motor1Speed = self.motor1pid(self.degrees1)
+            with self.degreesLock:
+                motor1Speed = self.motor1pid(self.degrees1)
             # Set Speed
             self.motor1.ChangeDutyCycle(abs(motor1Speed))
             # Set direction
@@ -190,8 +196,10 @@ class cameraMountController:
         if abs(self.degrees2 - self.targetPos) < self.tolerance:
             self.motor2.ChangeDutyCycle(0)
         else:
+            motor2Speed = 0
             # Calculate what speed should be
-            motor2Speed = self.motor2pid(self.degrees2) 
+            # with self.degreesLock:
+                # motor2Speed = self.motor2pid(self.degrees2) 
             # Set speed
             self.motor2.ChangeDutyCycle(abs(motor2Speed))
             # Set direction
@@ -208,42 +216,35 @@ class cameraMountController:
     '''
     def moveMotorsConnected(self):
         if abs(self.degrees1 - self.targetPos) < self.tolerance:
-            rospy.loginfo("Motors: AT Position")
+            rospy.loginfo("AT Position")
             self.motor1.ChangeDutyCycle(0)
             self.motor2.ChangeDutyCycle(0)
         else:
             # Get Value from PID
-            motorSpeed = self.motor1pid(self.degrees1)
-            rospy.loginfo("Motors: Moving, Speed: " + str(motorSpeed) + " Distance: " + str(self.degrees1 - self.targetPos)) 
+            with self.degreesLock:
+                motorSpeed = self.motor1pid(self.degrees1)
+            rospy.loginfo("Speed: " + str(motorSpeed) + " Distance: " + str(self.degrees1 - self.targetPos)) 
             # print("Motor Speed:", motorSpeed, "Distance:", (self.degrees1 - self.targetPos))
             # print("Position:", self.degrees1)
 
             # Set speed
             try:
-                rospy.loginfo("Setting Motor 1 Speed")
                 self.motor1.ChangeDutyCycle(abs(motorSpeed))
-                rospy.loginfo("Setting Motor 2 Speed")
                 self.motor2.ChangeDutyCycle(abs(motorSpeed))
-                rospy.loginfo("Set Motor Speed Done")
             except Exception as e:
                 rospy.loginfo("Error: Unable to set motor speed" + str(e))
             # Set direction
             try:
-                rospy.loginfo("Setting Motor Direction")
                 if motorSpeed <= 0:
-                    rospy.loginfo("Setting Motor Direction: Reverse")
                     IO.output(self.M1_1, IO.HIGH)
                     IO.output(self.M1_2, IO.LOW)
                     IO.output(self.M2_1, IO.LOW)
                     IO.output(self.M2_2, IO.HIGH)
-                    rospy.loginfo("Set Motor Direction Done")
                 elif motorSpeed > 0:
-                    rospy.loginfo("Setting Motor Direction: Forward")
                     IO.output(self.M1_1, IO.LOW)
                     IO.output(self.M1_2, IO.HIGH)
                     IO.output(self.M2_1, IO.HIGH)
                     IO.output(self.M2_2, IO.LOW)
-                    rospy.loginfo("Set Motor Direction Done")
             except Exception as e:
                 rospy.loginfo("Error: Unable to set motor direction" + str(e))
 
