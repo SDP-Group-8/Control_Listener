@@ -111,15 +111,12 @@ class cameraMountController:
     def newM1Callback(self, channel):
         yellow = IO.input(self.YELLOW1)  # stores the value of the encoders at time of interrupt
         blue = IO.input(self.YELLOW2)
-        if (yellow == 1 and self.d1Bold == 0) or (yellow == 0 and self.d1Bold == 1):
+        if (yellow == 1 and blue == 0):
         # this will be clockwise rotation
             self.degrees1 += 1
-        elif (yellow == 1 and self.d1Bold == 1) or (yellow == 0 and self.d1Bold == 0):
+        elif (yellow == 1 and self.blue == 0) :
         # this will be counter-clockwise rotation
             self.degrees1 -= 1
-        
-        self.d1Yold = yellow
-        self.d1Bold = blue
             
     def motor2Callback(self, channel):
         with self.degreesLock:
@@ -202,7 +199,7 @@ class cameraMountController:
                 #     self.moveMotorsIndependently()
                 # else:
                 #     self.moveMotorsConnected()
-                time.sleep(2)
+                time.sleep(0.2)
 
     def moveMotorsIndependently(self):
         '''
