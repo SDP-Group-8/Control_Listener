@@ -217,22 +217,30 @@ class cameraMountController:
 
             # Set speed
             try:
+                rospy.loginfo("Setting Motor 1 Speed")
                 self.motor1.ChangeDutyCycle(abs(motorSpeed))
+                rospy.loginfo("Setting Motor 2 Speed")
                 self.motor2.ChangeDutyCycle(abs(motorSpeed))
+                rospy.loginfo("Set Motor Speed Done")
             except Exception as e:
                 rospy.loginfo("Error: Unable to set motor speed" + str(e))
             # Set direction
             try:
+                rospy.loginfo("Setting Motor Direction")
                 if motorSpeed <= 0:
+                    rospy.loginfo("Setting Motor Direction: Reverse")
                     IO.output(self.M1_1, IO.HIGH)
                     IO.output(self.M1_2, IO.LOW)
                     IO.output(self.M2_1, IO.LOW)
                     IO.output(self.M2_2, IO.HIGH)
+                    rospy.loginfo("Set Motor Direction Done")
                 elif motorSpeed > 0:
+                    rospy.loginfo("Setting Motor Direction: Forward")
                     IO.output(self.M1_1, IO.LOW)
                     IO.output(self.M1_2, IO.HIGH)
                     IO.output(self.M2_1, IO.HIGH)
                     IO.output(self.M2_2, IO.LOW)
+                    rospy.loginfo("Set Motor Direction Done")
             except Exception as e:
                 rospy.loginfo("Error: Unable to set motor direction" + str(e))
 
