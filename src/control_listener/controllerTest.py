@@ -7,9 +7,8 @@ def main():
     c.turnOn()
     # Max height 300
     c.setCameraHeight(280)
-    while True:
-        print(c.degrees1, c.degrees2)
-        time.sleep(1)
+    time.sleep(20)
+    c.turnOff()
 
 if __name__ ==  '__main__':
     try:

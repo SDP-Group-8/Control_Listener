@@ -99,13 +99,15 @@ class cameraMountController:
     ROS Interface Functions
     '''
     def init(self):
-        rospy.Subscriber("/cmd_vel", Float32, self.setDistanceCallback)
+        rospy.Subscriber("/height", Float32, self.setDistanceCallback)
         rospy.init_node("control_listener_node", anonymous=True)
         rospy.spin()
         self.turnOn()
+        rospy.loginfo("starting")
         self.setCameraHeight(0)
 
     def setDistanceCallback(self, Float32):
+        rospy.loginfo("callingt callback!")
         self.setCameraHeight(Float32.data)
 
     # TODO ~ Add ROS Subscriber for turning on/off motors?
@@ -114,37 +116,45 @@ class cameraMountController:
     Motor Controller Functions
     '''
     def turnOn(self):
-        print("Turning on")
+        rospy.loginfo("Turning on...")
         try:
             self.motorsOn.set()
             self.motor1.start(0)
             self.motor2.start(0)
-            control_thread = threading.Thread(target=self.motorController)
+            control_thread = threading.Thread(target=self.motorController, daemon=True)
             control_thread.start()
+            rospy.loginfo("Turned On Successfully")
             return True
-        except:
+        except Exception as e:
+            rospy.loginfo("Error: Unable to start motor controller")
+            rospy.loginfo(e)
             print("Error: Unable to start motor controller")
             return False
     
     def turnOff(self):
         print("Turning off")
+        rospy.loginfo("Turning OFF motor controller")
         try:
             self.motorsOn.clear()
             self.motor1.stop()
             self.motor2.stop()
+            rospy.loginfo("Turned OFF successfully")
             return True
         except:
-            print("Error: Unable to stop motor controller")
+            rospy.loginfo("Error: Unable to stop motor controller")
             return False
 
     # Set the camera height target in the PID controller 
     def setCameraHeight(self, targetPos):
         if self.minPos <= targetPos <= self.maxPos:
+            rospy.loginfo("Updating Camera Height:")
+            rospy.loginfo(targetPos)
             print("Updating Camera Height", targetPos)
             self.targetPos = targetPos
             self.motor1pid.setpoint = targetPos
             self.motor2pid.setpoint = targetPos
         else:
+            rospy.loginfo("Invalid Height Input")
             print("Invalid Position Input")
 
     def motorController(self):
@@ -199,6 +209,8 @@ class cameraMountController:
     Uses one PID controller and treats both motors as 1
     '''
     def moveMotorsConnected(self):
+        rospy.loginfo("Moving Motors")
+
         if abs(self.degrees1 - self.targetPos) < self.tolerance:
             print("Within Tolerance", abs(self.degrees1 - self.targetPos))
             self.motor1.ChangeDutyCycle(0)
