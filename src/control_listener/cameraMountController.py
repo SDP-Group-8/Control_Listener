@@ -33,16 +33,18 @@ class cameraMountController:
         self.independentControl = False # default value: False
 
         self.targetPos = 0 # initial target position
-        self.tolerance = 4
+        self.tolerance = 2
+
+        self.degreesLock = threading.Lock()
 
         '''
         Motor Controller Setup
         '''
-        self.degreesLock = threading.Lock()
         with self.degreesLock:
             self.degrees1 = 0
             self.degrees2 = 0
 
+        self.motorSpeed = None
         # self.motor1pid = PID(4, 2, 0.1)
         # self.motor1pid = None
         # self.motor2pid = PID(0, 0, 0)
@@ -53,7 +55,7 @@ class cameraMountController:
         # Setup Control Thread
         self.motorsOn = threading.Event()
         self.control_thread = threading.Thread(target=self.motorController)
-
+        self.print_thread = threading.Thread(target=self.printLoop)
     def setupGPIO(self):
         IO.setwarnings(False)
         IO.setmode(IO.BCM)
@@ -86,17 +88,19 @@ class cameraMountController:
         # Blue1 Pin = 20
         if (IO.input(21) == IO.input(20)):
         # this will be clockwise rotation
+            # with self.degreesLock:
             self.degrees1 += 1
         else:
+            #with self.degreesLock:
             self.degrees1 -= 1
             
-    def motor2Callback(self, channel):
+    # def motor2Callback(self, channel):
         # Yellow2 Pin = 26
         # Blue2 Pin = 19
-        if (IO.input(26) == IO.input(19)):
-            self.degrees2 += 1
-        else:
-            self.degrees2 -= 1
+      #  if (IO.input(26) == IO.input(19)):
+       #     self.degrees2 += 1
+       # else:
+        #    self.degrees2 -= 1
 
     '''
     ROS Interface Functions
@@ -107,9 +111,9 @@ class cameraMountController:
         rospy.on_shutdown(self.turnOff)
         # TODO move this??
         self.motor1pid = PID(p, i, d)
-        self.motor2pid = PID(p, i, d)
-        self.motor1pid.output_limits = (-50, 100)
-        self.motor2pid.output_limits = (-50, 100)
+        # self.motor2pid = PID(p, i, d)
+        self.motor1pid.output_limits = (-40, 100)
+        # self.motor2pid.output_limits = (-50, 100)
         self.turnOn()
         self.setCameraHeight(cameraHeight)
         rospy.spin()
@@ -127,10 +131,12 @@ class cameraMountController:
         try:
             self.setupGPIO()
             self.motorsOn.set()
-            self.motor1.start(0)
-            self.motor2.start(0)
+            with self.degreesLock: 
+                self.motor1.start(0)
+                self.motor2.start(0)
             # self.setCameraHeight(0)
             self.control_thread.start()
+            self.print_thread.start()
             rospy.loginfo("Turned On Successfully")
         except Exception as e:
             rospy.loginfo("Error: Unable to start motor controller" + str(e))
@@ -139,14 +145,12 @@ class cameraMountController:
         print("Turning off")
         rospy.loginfo("Turning OFF motor controller")
         try:
-            try:
-                with threading.Lock:
-                    self.motorsOn.clear()
-            except:
+            with self.degreesLock:
                 self.motorsOn.clear()
-            self.motor1.stop()
-            self.motor2.stop()
+                self.motor1.stop()
+                self.motor2.stop()
             self.control_thread.join()
+            self.print_thread.join()
             IO.cleanup()
             rospy.loginfo("Turned OFF successfully")
         except Exception as e:
@@ -156,9 +160,10 @@ class cameraMountController:
     def setCameraHeight(self, targetPos):
         if self.minPos <= targetPos <= self.maxPos:
             rospy.loginfo("Updating Camera Height:" + str(targetPos))
-            self.targetPos = targetPos
-            self.motor1pid.setpoint = targetPos
-            self.motor2pid.setpoint = targetPos
+            with self.degreesLock:
+                self.targetPos = targetPos
+                self.motor1pid.setpoint = targetPos
+                # self.motor2pid.setpoint = targetPos
         else:
             rospy.loginfo("Invalid Height Input")
 
@@ -166,9 +171,15 @@ class cameraMountController:
         # While motors not in the correct position and the stop motors flag is not set
         while self.motorsOn.is_set() and not rospy.is_shutdown():
                 # rospy.loginfo("1:" + str(self.degrees1) + " 2:" + str(self.degrees2))
-                self.moveMotorsConnected()
+                sleep(0.5)
+                # self.moveMotorsConnected()
                 # Takes an average of 12.5ms to run. 50Hz = 20ms per run. so sleep 7.5ms
-                sleep(0.0075)
+                # sleep(0.020)
+
+    def printLoop(self):
+        while self.motorsOn.is_set() and not rospy.is_shutdown():
+            rospy.loginfo("degrees: " + str(self.degrees1))
+            sleep(1)
 
     def moveMotorsIndependently(self):
         '''
@@ -176,27 +187,29 @@ class cameraMountController:
         '''
         if abs(self.degrees1 - self.targetPos) < self.tolerance:
             print("Within Tolerance")
-            self.motor1.ChangeDutyCycle(0)
+            with self.degreesLock:
+                self.motor1.ChangeDutyCycle(0)
         else:
             # Calculate what speed should be
             with self.degreesLock:
                 motor1Speed = self.motor1pid(self.degrees1)
-            # Set Speed
-            self.motor1.ChangeDutyCycle(abs(motor1Speed))
-            # Set direction
-            if motor1Speed <= 0:
-                IO.output(self.M1_1, IO.HIGH)
-                IO.output(self.M1_2, IO.LOW)
-            elif motor1Speed > 0:
-                IO.output(self.M1_1, IO.LOW)
-                IO.output(self.M1_2, IO.HIGH)
+                # Set Speed
+                self.motor1.ChangeDutyCycle(abs(motor1Speed))
+                # Set direction
+                if motor1Speed <= 0:
+                    IO.output(self.M1_1, IO.HIGH)
+                    IO.output(self.M1_2, IO.LOW)
+                elif motor1Speed > 0:
+                    IO.output(self.M1_1, IO.LOW)
+                    IO.output(self.M1_2, IO.HIGH)
 
         '''
         Motor 2
         '''
         with self.degreesLock:
-            motor2Speed = self.motor2pid(self.degrees2) 
+#            motor2Speed = self.motor2pid(self.degrees2) 
         # Set speed
+            motor2speed = 0
         if abs(self.degrees2 - self.targetPos) < self.tolerance:
             self.motor2.ChangeDutyCycle(0)
         else:
@@ -214,26 +227,25 @@ class cameraMountController:
     Uses one PID controller and treats both motors as 1
     '''
     def moveMotorsConnected(self):
-        
-        with self.degreesLock:
-            motorSpeed = self.motor1pid(self.degrees1)
-        rospy.loginfo("Speed: " + str(round(motorSpeed, 2))) #  + " Distance: " + str(self.degrees1 - self.targetPos)) 
         # If within tolerance stop
+        # with self.degreesLock:
         if abs(self.degrees1 - self.targetPos) < self.tolerance:
-            # rospy.loginfo("AT Position")
+            #rospy.loginfo("AT TARGET")
             self.motor1.ChangeDutyCycle(0)
             self.motor2.ChangeDutyCycle(0)
-        # else move motors
+      # else move motors
         else:
-            self.motor1.ChangeDutyCycle(abs(motorSpeed))
-            self.motor2.ChangeDutyCycle(abs(motorSpeed))
+            self.motorSpeed = self.motor1pid(self.degrees1)
+            #rospy.loginfo("Speed: " + str(round(motorSpeed, 2)) + " Distance: " + str(error)) 
+            self.motor1.ChangeDutyCycle(abs(self.motorSpeed))
+            self.motor2.ChangeDutyCycle(abs(self.motorSpeed))
             # Set direction
-            if motorSpeed <= 0:
+            if self.motorSpeed <= 0:
                 IO.output(self.M1_1, IO.HIGH)
                 IO.output(self.M1_2, IO.LOW)
                 IO.output(self.M2_1, IO.LOW)
                 IO.output(self.M2_2, IO.HIGH)
-            elif motorSpeed > 0:
+            elif self.motorSpeed > 0:
                 IO.output(self.M1_1, IO.LOW)
                 IO.output(self.M1_2, IO.HIGH)
                 IO.output(self.M2_1, IO.HIGH)
