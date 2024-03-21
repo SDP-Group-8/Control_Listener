@@ -1,5 +1,6 @@
 import threading
-import time
+from time import sleep
+from time import perf_counter_ns
 import RPi.GPIO as IO
 from simple_pid import PID 
 
@@ -32,7 +33,7 @@ class cameraMountController:
         self.independentControl = False # default value: False
 
         self.targetPos = 0 # initial target position
-        self.tolerance = 5
+        self.tolerance = 4
 
         '''
         Motor Controller Setup
@@ -41,9 +42,6 @@ class cameraMountController:
         with self.degreesLock:
             self.degrees1 = 0
             self.degrees2 = 0
-
-        self.d1Bold = 0
-        self.d1Yold = 0
 
         # self.motor1pid = PID(4, 2, 0.1)
         # self.motor1pid = None
@@ -84,8 +82,6 @@ class cameraMountController:
     '''
     
     def motor1Callback(self, channel):
-        # yellow = IO.input(self.YELLOW1)  # stores the value of the encoders at time of interrupt
-        # blue = IO.input(self.YELLOW2)
         # Yellow1 Pin = 21
         # Blue1 Pin = 20
         if (IO.input(21) == IO.input(20)):
@@ -94,15 +90,14 @@ class cameraMountController:
         else:
             self.degrees1 -= 1
             
-    # def motor2Callback(self, channel):
-    #     with self.degreesLock:
-    #         # Read motor encoder inputs
-    #         blue = IO.input(self.BLUE2)
-    #         # Update motor position
-    #         if blue:
-    #             self.degrees2 += 1
-    #         else:
-    #             self.degrees2 -= 1
+    def motor2Callback(self, channel):
+        # Yellow2 Pin = 26
+        # Blue2 Pin = 19
+        if (IO.input(26) == IO.input(19)):
+            self.degrees2 += 1
+        else:
+            self.degrees2 -= 1
+
     '''
     ROS Interface Functions
     '''
@@ -113,8 +108,8 @@ class cameraMountController:
         # TODO move this??
         self.motor1pid = PID(p, i, d)
         self.motor2pid = PID(p, i, d)
-        self.motor1pid.output_limits = (-70, 100)
-        self.motor2pid.output_limits = (-70, 100)
+        self.motor1pid.output_limits = (-50, 100)
+        self.motor2pid.output_limits = (-50, 100)
         self.turnOn()
         self.setCameraHeight(cameraHeight)
         rospy.spin()
@@ -172,7 +167,8 @@ class cameraMountController:
         while self.motorsOn.is_set() and not rospy.is_shutdown():
                 # rospy.loginfo("1:" + str(self.degrees1) + " 2:" + str(self.degrees2))
                 self.moveMotorsConnected()
-                time.sleep(0.005)
+                # Takes an average of 12.5ms to run. 50Hz = 20ms per run. so sleep 7.5ms
+                sleep(0.0075)
 
     def moveMotorsIndependently(self):
         '''
@@ -220,14 +216,14 @@ class cameraMountController:
     '''
     def moveMotorsConnected(self):
         if abs(self.degrees1 - self.targetPos) < self.tolerance:
-            rospy.loginfo("AT Position")
+            # rospy.loginfo("AT Position")
             self.motor1.ChangeDutyCycle(0)
             self.motor2.ChangeDutyCycle(0)
         else:
             # Get Value from PID
             with self.degreesLock:
                 motorSpeed = self.motor1pid(self.degrees1)
-            rospy.loginfo("Speed: " + str(motorSpeed) + " Distance: " + str(self.degrees1 - self.targetPos)) 
+            rospy.loginfo("Speed: " + str(round(motorSpeed, 2))) #  + " Distance: " + str(self.degrees1 - self.targetPos)) 
             # print("Motor Speed:", motorSpeed, "Distance:", (self.degrees1 - self.targetPos))
             # print("Position:", self.degrees1)
 
