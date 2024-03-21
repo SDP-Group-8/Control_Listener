@@ -120,13 +120,13 @@ class MotorController:
         # If within tolerance stop
         # with self.degreesLock:
         if abs(self.degrees1 - self.targetPos) < self.tolerance:
-            #rospy.loginfo("AT TARGET")
+            rospy.loginfo("AT TARGET")
             self.motor1.ChangeDutyCycle(0)
             self.motor2.ChangeDutyCycle(0)
       # else move motors
         else:
             motorSpeed = self.motor1pid(self.degrees1)
-            #rospy.loginfo("Speed: " + str(round(motorSpeed, 2)) + " Distance: " + str(error)) 
+            rospy.loginfo("Speed: " + str(round(motorSpeed, 2)) + " Distance: " + str(self.degrees1 - self.targetPos)) 
             self.motor1.ChangeDutyCycle(abs(motorSpeed))
             self.motor2.ChangeDutyCycle(abs(motorSpeed))
             # Set direction
