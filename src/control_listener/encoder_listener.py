@@ -21,6 +21,8 @@ class EncoderListener:
         self.degrees2 = 0
 
         self.encoder = RotaryEncoder(a=self.YELLOW1, b=self.BLUE1)
+        self.encoder.max_steps = 10000
+        self.encoder.min_steps = -10000
         self.encoder.when_rotated = self.publisherCallback
 
     def setupGPIO(self):
