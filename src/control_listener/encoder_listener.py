@@ -16,7 +16,6 @@ class EncoderListener:
         '''
         Motor Controller Setup
         '''
-        
         self.degrees1 = 0
         self.degrees2 = 0
 
