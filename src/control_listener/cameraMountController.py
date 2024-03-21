@@ -194,13 +194,12 @@ class cameraMountController:
         '''
         Motor 2
         '''
+        with self.degreesLock:
+            motor2Speed = self.motor2pid(self.degrees2) 
+        # Set speed
         if abs(self.degrees2 - self.targetPos) < self.tolerance:
             self.motor2.ChangeDutyCycle(0)
         else:
-            # Calculate what speed should be
-            with self.degreesLock:
-                motor2Speed = self.motor2pid(self.degrees2) 
-            # Set speed
             self.motor2.ChangeDutyCycle(abs(motor2Speed))
             # Set direction
             if motor2Speed <= 0:
@@ -215,36 +214,27 @@ class cameraMountController:
     Uses one PID controller and treats both motors as 1
     '''
     def moveMotorsConnected(self):
+        
+        with self.degreesLock:
+            motorSpeed = self.motor1pid(self.degrees1)
+        rospy.loginfo("Speed: " + str(round(motorSpeed, 2))) #  + " Distance: " + str(self.degrees1 - self.targetPos)) 
+        # If within tolerance stop
         if abs(self.degrees1 - self.targetPos) < self.tolerance:
             # rospy.loginfo("AT Position")
             self.motor1.ChangeDutyCycle(0)
             self.motor2.ChangeDutyCycle(0)
+        # else move motors
         else:
-            # Get Value from PID
-            with self.degreesLock:
-                motorSpeed = self.motor1pid(self.degrees1)
-            rospy.loginfo("Speed: " + str(round(motorSpeed, 2))) #  + " Distance: " + str(self.degrees1 - self.targetPos)) 
-            # print("Motor Speed:", motorSpeed, "Distance:", (self.degrees1 - self.targetPos))
-            # print("Position:", self.degrees1)
-
-            # Set speed
-            try:
-                self.motor1.ChangeDutyCycle(abs(motorSpeed))
-                self.motor2.ChangeDutyCycle(abs(motorSpeed))
-            except Exception as e:
-                rospy.loginfo("Error: Unable to set motor speed" + str(e))
+            self.motor1.ChangeDutyCycle(abs(motorSpeed))
+            self.motor2.ChangeDutyCycle(abs(motorSpeed))
             # Set direction
-            try:
-                if motorSpeed <= 0:
-                    IO.output(self.M1_1, IO.HIGH)
-                    IO.output(self.M1_2, IO.LOW)
-                    IO.output(self.M2_1, IO.LOW)
-                    IO.output(self.M2_2, IO.HIGH)
-                elif motorSpeed > 0:
-                    IO.output(self.M1_1, IO.LOW)
-                    IO.output(self.M1_2, IO.HIGH)
-                    IO.output(self.M2_1, IO.HIGH)
-                    IO.output(self.M2_2, IO.LOW)
-            except Exception as e:
-                rospy.loginfo("Error: Unable to set motor direction" + str(e))
-
+            if motorSpeed <= 0:
+                IO.output(self.M1_1, IO.HIGH)
+                IO.output(self.M1_2, IO.LOW)
+                IO.output(self.M2_1, IO.LOW)
+                IO.output(self.M2_2, IO.HIGH)
+            elif motorSpeed > 0:
+                IO.output(self.M1_1, IO.LOW)
+                IO.output(self.M1_2, IO.HIGH)
+                IO.output(self.M2_1, IO.HIGH)
+                IO.output(self.M2_2, IO.LOW)
