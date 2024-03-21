@@ -29,7 +29,7 @@ class MotorController:
         self.targetPos = 0 # initial target position
         self.tolerance = 2
 
-        self.motorSpeed = None
+        self.degrees1 = 0
         
         # Setup Control Thread
         self.motorsOn = threading.Event()
@@ -63,7 +63,6 @@ class MotorController:
         self.turnOn()
         self.setCameraHeight(cameraHeight)
         rospy.spin()
-        self.turnOff()
 
     def setDistanceCallback(self, height):
         rospy.loginfo("Calling Callback!")
@@ -126,17 +125,17 @@ class MotorController:
             self.motor2.ChangeDutyCycle(0)
       # else move motors
         else:
-            self.motorSpeed = self.motor1pid(self.degrees1)
+            motorSpeed = self.motor1pid(self.degrees1)
             #rospy.loginfo("Speed: " + str(round(motorSpeed, 2)) + " Distance: " + str(error)) 
-            self.motor1.ChangeDutyCycle(abs(self.motorSpeed))
-            self.motor2.ChangeDutyCycle(abs(self.motorSpeed))
+            self.motor1.ChangeDutyCycle(abs(motorSpeed))
+            self.motor2.ChangeDutyCycle(abs(motorSpeed))
             # Set direction
-            if self.motorSpeed <= 0:
+            if motorSpeed <= 0:
                 IO.output(self.M1_1, IO.HIGH)
                 IO.output(self.M1_2, IO.LOW)
                 IO.output(self.M2_1, IO.LOW)
                 IO.output(self.M2_2, IO.HIGH)
-            elif self.motorSpeed > 0:
+            elif motorSpeed > 0:
                 IO.output(self.M1_1, IO.LOW)
                 IO.output(self.M1_2, IO.HIGH)
                 IO.output(self.M2_1, IO.HIGH)
