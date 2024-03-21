@@ -1,5 +1,6 @@
 import RPi.GPIO as IO
 import rospy
+from gpiozero import RotaryEncoder
 
 from std_msgs.msg import Float32
 
@@ -28,27 +29,31 @@ class EncoderListener:
         IO.setup(self.YELLOW2, IO.IN, pull_up_down=IO.PUD_DOWN)
         IO.setup(self.BLUE2, IO.IN, pull_up_down=IO.PUD_DOWN)
 
-        IO.add_event_detect(self.YELLOW1, IO.RISING, callback=self.motor1Callback, bouncetime=2)
+        # IO.add_event_detect(self.YELLOW1, IO.RISING, callback=self.motor1Callback, bouncetime=2)
 
     '''
     Encoder Callbacks to Detect Motor Position
     '''
     
-    def motor1Callback(self, channel):
-        # Yellow1 Pin = 21
-        # Blue1 Pin = 20
-        if (IO.input(21) == IO.input(20)):
-            self.degrees1 += 1
-        else:
-            self.degrees1 -= 1
+    # def motor1Callback(self, channel):
+    #     # Yellow1 Pin = 21
+    #     # Blue1 Pin = 20
+    #     if (IO.input(21) == IO.input(20)):
+    #         self.degrees1 += 1
+    #     else:
+    #         self.degrees1 -= 1
 
+    #     self.degrees_publisher.publish(float(self.degrees1))
+
+    def publisherCallback(self):
         self.degrees_publisher.publish(float(self.degrees1))
-
     '''
     ROS Interface Functions
     '''
     def init(self):
         self.degrees_publisher = rospy.Publisher("/degrees", Float32)
         self.setupGPIO()
+        encoder = RotaryEncoder(a=self.YELLOW1, b=self.BLUE1)
+        encoder.when_rotated = self.publisherCallback
         rospy.init_node("control_listener_node", anonymous=True)
         rospy.spin()
