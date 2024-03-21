@@ -22,7 +22,7 @@ class MotorController:
         Config Variables
         '''
         self.minPos = 0
-        self.maxPos = 500
+        self.maxPos = 450
 
         self.independentControl = False # default value: False
 
