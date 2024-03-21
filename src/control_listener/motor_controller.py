@@ -69,7 +69,7 @@ class MotorController:
         self.setCameraHeight(height.data)
 
     def setDegreesCallback(self, degrees):
-        self.degrees1 = degrees
+        self.degrees1 = int(degrees.data)
 
     '''
     Motor Controller Functions
@@ -119,7 +119,7 @@ class MotorController:
     def moveMotorsConnected(self):
         # If within tolerance stop
         # with self.degreesLock:
-        if abs(int(self.degrees1) - self.targetPos) < self.tolerance:
+        if abs(self.degrees1 - self.targetPos) < self.tolerance:
             #rospy.loginfo("AT TARGET")
             self.motor1.ChangeDutyCycle(0)
             self.motor2.ChangeDutyCycle(0)
