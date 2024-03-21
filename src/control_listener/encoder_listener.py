@@ -20,7 +20,8 @@ class EncoderListener:
         self.degrees1 = 0
         self.degrees2 = 0
 
-        self.encoder = RotaryEncoder(a=self.YELLOW1, b=self.BLUE1, max_steps=10000, when_rotated=self.publisherCallback)
+        self.encoder = RotaryEncoder(a=self.YELLOW1, b=self.BLUE1, max_steps=10000)
+        self.encoder.when_rotated = self.publisherCallback
         # self.encoder.max_steps = 10000
         # self.encoder.min_steps = -10000
         # self.encoder.when_rotated = self.publisherCallback
