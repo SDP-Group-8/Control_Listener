@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="control_listener" respawn="false" type="run_listener" name="encoder_listener" output="screen"/>
+  <node pkg="control_listener" respawn="false" type="run_controller" name="motor_controller" output="screen"/>
+</launch>

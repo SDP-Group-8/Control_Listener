@@ -1,12 +1,11 @@
 #! /usr/bin/env python
 
+import rospy
 from control_listener.encoder_listener import EncoderListener
-from control_listener.motor_controller import MotorController
 
 if __name__ == '__main__':
-    encoder_node = EncoderListener()
-    encoder_node.init()
-
-    motor_controller = MotorController()
-    motor_controller.init(0, 1, 0, 0)
-
+    try:
+        listener = EncoderListener()
+        listener.init()
+    except rospy.ROSInterruptException:
+        pass
