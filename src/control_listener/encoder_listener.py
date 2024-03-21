@@ -49,5 +49,6 @@ class EncoderListener:
     '''
     def init(self):
         self.degrees_publisher = rospy.Publisher("/degrees", Float32)
+        self.setupGPIO()
         rospy.init_node("control_listener_node", anonymous=True)
         rospy.spin()
