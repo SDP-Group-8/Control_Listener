@@ -20,6 +20,9 @@ class EncoderListener:
         self.degrees1 = 0
         self.degrees2 = 0
 
+        self.encoder = RotaryEncoder(a=self.YELLOW1, b=self.BLUE1)
+        self.encoder.when_rotated = self.publisherCallback
+
     def setupGPIO(self):
         IO.setwarnings(False)
         IO.setmode(IO.BCM)
@@ -46,14 +49,12 @@ class EncoderListener:
     #     self.degrees_publisher.publish(float(self.degrees1))
 
     def publisherCallback(self):
-        self.degrees_publisher.publish(float(self.degrees1))
+        self.degrees_publisher.publish(float(self.encoder.steps))
     '''
     ROS Interface Functions
     '''
     def init(self):
         self.degrees_publisher = rospy.Publisher("/degrees", Float32)
         self.setupGPIO()
-        encoder = RotaryEncoder(a=self.YELLOW1, b=self.BLUE1)
-        encoder.when_rotated = self.publisherCallback
         rospy.init_node("control_listener_node", anonymous=True)
         rospy.spin()
