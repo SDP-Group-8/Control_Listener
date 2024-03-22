@@ -15,10 +15,11 @@ class EncoderListener:
         self.read_encoder_thread = threading.Thread(target=self.read_encoder_loop)
 
     def read_encoder_loop(self):
-        for event in self.device.read_loop():
-            if event.type == evdev.ecodes.EV_REL:
-                self.steps += event.value
-                self.degrees_publisher.publish(float(self.steps))
+        while not rospy.is_shutdown():
+            for event in self.device.read_loop():
+                if event.type == evdev.ecodes.EV_REL:
+                    self.steps += event.value
+                    self.degrees_publisher.publish(float(self.steps))
 
     '''
     ROS Interface Functions
@@ -28,4 +29,3 @@ class EncoderListener:
         rospy.init_node("control_listener_node", anonymous=True)
         self.read_encoder_thread.start()
         rospy.spin()
-        self.read_encoder_thread.join()
