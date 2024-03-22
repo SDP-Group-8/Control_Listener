@@ -18,7 +18,7 @@ class EncoderListener:
         while not rospy.is_shutdown():
             for event in self.device.read_loop():
                 if event.type == evdev.ecodes.EV_REL:
-                    self.steps += event.value
+                    self.steps -= event.value
                     self.degrees_publisher.publish(float(self.steps))
 
     '''
