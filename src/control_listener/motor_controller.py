@@ -22,12 +22,12 @@ class MotorController:
         Config Variables
         '''
         self.minPos = 0
-        self.maxPos = 450
+        self.maxPos = 515
 
         self.independentControl = False # default value: False
 
         self.targetPos = 0 # initial target position
-        self.tolerance = 2
+        self.tolerance = 0
 
         self.degrees1 = 0
         
