@@ -20,6 +20,7 @@ class EncoderListener:
     def read_encoder(self):
         for event in self.device.read_loop():
             if self.stop.is_set():
+                self.device.close()
                 break
             elif event.type == evdev.ecodes.EV_REL:
                 self.steps -= event.value
