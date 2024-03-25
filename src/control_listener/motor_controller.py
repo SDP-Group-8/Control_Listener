@@ -1,7 +1,9 @@
 import threading
 from time import sleep
+import time
 import RPi.GPIO as IO
 from simple_pid import PID 
+import csv
 
 import rospy
 from std_msgs.msg import Float32
@@ -27,13 +29,18 @@ class MotorController:
         self.independentControl = False # default value: False
 
         self.targetPos = 0 # initial target position
-        self.tolerance = 0
+        self.tolerance = 3
 
         self.degrees1 = 0
         
         # Setup Control Thread
         self.motorsOn = threading.Event()
         self.control_thread = threading.Thread(target=self.motorController)
+        
+        pidQA = open("/home/pi/pidQA", 'w')
+        self.csvWriter = csv.writer(pidQA, delimiter=',')
+        self.csvWriter.writerow(['timestamp', 'actual', 'target'])
+        self.starttime = None
 
     def setupGPIO(self):
         IO.setwarnings(False)
@@ -59,13 +66,14 @@ class MotorController:
         rospy.init_node("control_listener_node", anonymous=True)
         rospy.on_shutdown(self.turnOff)
         self.motor1pid = PID(p, i, d)
-        self.motor1pid.output_limits = (-40, 100)
+        self.motor1pid.output_limits = (-70, 100)
         self.turnOn()
         self.setCameraHeight(cameraHeight)
         rospy.spin()
 
     def setDistanceCallback(self, height):
         rospy.loginfo("Calling Callback!")
+        self.starttime = time.time()
         self.setCameraHeight(height.data)
 
     def setDegreesCallback(self, degrees):
@@ -119,6 +127,9 @@ class MotorController:
     def moveMotorsConnected(self):
         # If within tolerance stop
         # with self.degreesLock:
+        if self.starttime:
+            timestamp = time.time() - self.starttime
+            self.csvWriter.writerow([timestamp, self.degrees1, self.targetPos])
         if abs(self.degrees1 - self.targetPos) < self.tolerance:
             rospy.loginfo("AT TARGET")
             self.motor1.ChangeDutyCycle(0)
