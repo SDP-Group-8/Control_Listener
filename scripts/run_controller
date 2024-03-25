@@ -7,6 +7,6 @@ if __name__ == '__main__':
     try:
         controller = MotorController()
         # Started Oscillating at P=10. So set to 5
-        controller.init(0, 5, 3, 0.8)
+        controller.init(0, 5, 4, 1)
     except rospy.ROSInterruptException:
         pass
